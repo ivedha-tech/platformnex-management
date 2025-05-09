@@ -42,10 +42,7 @@ export function DonutChart({
               />
               <span className="text-sm text-gray-700">{entry.name}</span>
             </div>
-            <div className="flex items-center space-x-2">
-              <span className="text-sm font-medium text-gray-900">
-                {tooltipFormatter ? tooltipFormatter(entry.value) : entry.value}
-              </span>
+            <div className="flex items-center">
               <Badge variant="secondary" className="text-xs">
                 {Math.round((entry.value / total) * 100)}%
               </Badge>
@@ -81,8 +78,8 @@ export function DonutChart({
                 </Pie>
                 <Tooltip
                   formatter={(value: number) => [
-                    tooltipFormatter ? tooltipFormatter(value) : value,
-                    "Value",
+                    `${Math.round((value / total) * 100)}%`,
+                    "Percentage",
                   ]}
                 />
               </PieChart>
