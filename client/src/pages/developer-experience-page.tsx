@@ -10,16 +10,17 @@ import { Download } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Feedback, DeveloperMetric } from "@shared/schema";
 
 // Sample data for the platform usage chart
 const platformUsageData = [
-  { name: "Mon", users: 120 },
-  { name: "Tue", users: 150 },
-  { name: "Wed", users: 170 },
-  { name: "Thu", users: 140 },
-  { name: "Fri", users: 130 },
-  { name: "Sat", users: 80 },
-  { name: "Sun", users: 60 },
+  { name: "Mon", developers: 120 },
+  { name: "Tue", developers: 150 },
+  { name: "Wed", developers: 170 },
+  { name: "Thu", developers: 140 },
+  { name: "Fri", developers: 130 },
+  { name: "Sat", developers: 80 },
+  { name: "Sun", developers: 60 },
 ];
 
 // Sample data for task distribution
@@ -33,12 +34,12 @@ export default function DeveloperExperiencePage() {
   const [timeRange, setTimeRange] = useState("7days");
   
   // Fetch metrics data
-  const { data: metrics, isLoading: isLoadingMetrics } = useQuery({
+  const { data: metrics, isLoading: isLoadingMetrics } = useQuery<DeveloperMetric[]>({
     queryKey: ["/api/metrics/developer"],
   });
   
   // Fetch feedback data
-  const { data: feedbackItems, isLoading: isLoadingFeedback } = useQuery({
+  const { data: feedbackItems, isLoading: isLoadingFeedback } = useQuery<Feedback[]>({
     queryKey: ["/api/feedback"],
   });
   
@@ -73,7 +74,7 @@ export default function DeveloperExperiencePage() {
       </div>
       
       {/* Key metrics cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7 gap-6 mb-6">
         <MetricCard
           title="Developer Satisfaction"
           value={89}
@@ -81,14 +82,16 @@ export default function DeveloperExperiencePage() {
           percentageChange={4}
           progress={89}
           suffix="/100"
+          className="xl:col-span-1"
         />
         
         <MetricCard
-          title="Daily Active Users"
+          title="Daily Active Developers"
           value={124}
           percentageChange={12}
           progress={83}
           target={150}
+          className="xl:col-span-1"
         />
         
         <MetricCard
@@ -97,6 +100,7 @@ export default function DeveloperExperiencePage() {
           previousValue="94%"
           percentageChange={-2}
           progress={92}
+          className="xl:col-span-1"
         />
         
         <MetricCard
@@ -106,6 +110,34 @@ export default function DeveloperExperiencePage() {
           percentageChange={8}
           progress={95}
           progressColor="bg-emerald-500"
+          target="2 Secs"
+          className="xl:col-span-1"
+        />
+        
+        <MetricCard
+          title="Platform Adoption Rate"
+          value="78%"
+          percentageChange={6}
+          progress={78}
+          className="xl:col-span-1"
+        />
+        
+        <MetricCard
+          title="Golden Path Usage Rate"
+          value="65%"
+          percentageChange={12}
+          progress={65}
+          className="xl:col-span-1"
+        />
+        
+        <MetricCard
+          title="Developer Retention on Platform"
+          value="94%"
+          previousValue="91%"
+          percentageChange={3}
+          progress={94}
+          progressColor="bg-emerald-500"
+          className="xl:col-span-1"
         />
       </div>
       
@@ -114,7 +146,7 @@ export default function DeveloperExperiencePage() {
         <AreaChart
           title="Platform Usage Trends"
           data={platformUsageData}
-          dataKey="users"
+          dataKey="developers"
           className="col-span-2"
           timeRanges={["daily", "weekly", "monthly"]}
         />
@@ -139,8 +171,8 @@ export default function DeveloperExperiencePage() {
         <div className="divide-y divide-gray-100">
           {isLoadingFeedback ? (
             <div className="p-8 text-center text-gray-500">Loading feedback...</div>
-          ) : feedbackItems?.length > 0 ? (
-            feedbackItems.map((item: any, index: number) => (
+          ) : feedbackItems && feedbackItems.length > 0 ? (
+            feedbackItems.map((item, index) => (
               <FeedbackItem
                 key={index}
                 name={`User ${item.userId}`}
