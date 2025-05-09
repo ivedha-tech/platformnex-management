@@ -32,27 +32,28 @@ function SidebarLink({ href, icon, children, currentPath, onClick }: SidebarLink
   const isActive = currentPath === href;
   
   return (
-    <Link href={href}>
-      <a
-        className={cn(
-          "flex items-center px-4 py-2 text-sm rounded-md group transition-colors hover:bg-primary-50 hover:text-primary-700 dark:hover:bg-gray-800",
-          isActive
-            ? "bg-primary-50 text-primary-700 border-l-2 border-primary-700 dark:bg-gray-800 dark:text-primary-400 dark:border-primary-400"
-            : "text-gray-700 dark:text-gray-300"
-        )}
-        onClick={onClick}
-      >
-        <div className={cn(
-          "mr-3 h-5 w-5",
-          isActive
-            ? "text-primary-700 dark:text-primary-400"
-            : "text-gray-500 dark:text-gray-400 group-hover:text-primary-700 dark:group-hover:text-primary-400"
-        )}>
-          {icon}
+    <div onClick={onClick}>
+      <Link href={href}>
+        <div
+          className={cn(
+            "flex items-center px-4 py-2 text-sm rounded-md group transition-colors hover:bg-primary-50 hover:text-primary-700 dark:hover:bg-gray-800 cursor-pointer",
+            isActive
+              ? "bg-primary-50 text-primary-700 border-l-2 border-primary-700 dark:bg-gray-800 dark:text-primary-400 dark:border-primary-400"
+              : "text-gray-700 dark:text-gray-300"
+          )}
+        >
+          <div className={cn(
+            "mr-3 h-5 w-5",
+            isActive
+              ? "text-primary-700 dark:text-primary-400"
+              : "text-gray-500 dark:text-gray-400 group-hover:text-primary-700 dark:group-hover:text-primary-400"
+          )}>
+            {icon}
+          </div>
+          {children}
         </div>
-        {children}
-      </a>
-    </Link>
+      </Link>
+    </div>
   );
 }
 
