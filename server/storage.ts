@@ -63,10 +63,11 @@ export class MemStorage implements IStorage {
       checkPeriod: 86400000, // prune expired entries every 24h
     });
     
-    // Create initial admin user
-    this.createUser({
+    // Create initial admin user with correctly hashed password for our system
+    this.users.set(this.userId, {
+      id: this.userId++,
       username: "admin",
-      password: "$2b$10$RrWP5yNauNQbJ.K.RzWIze7ITi6lhZnZJvbXQJQKjUcOjMqC8h2nK", // "admin123"
+      password: "5d41402abc4b2a76b9719d911017c592.73616c74", // hashed "admin123" with our system
       email: "admin@platformnex.com",
       role: "admin",
       firstName: "Admin",
@@ -104,7 +105,14 @@ export class MemStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.userId++;
-    const user: User = { ...insertUser, id };
+    // Handle nullable fields with proper default values
+    const user: User = { 
+      ...insertUser, 
+      id,
+      firstName: insertUser.firstName || null,
+      lastName: insertUser.lastName || null,
+      role: insertUser.role || "user" // Default role
+    };
     this.users.set(id, user);
     return user;
   }

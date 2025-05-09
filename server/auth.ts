@@ -13,19 +13,18 @@ declare global {
   }
 }
 
-const scryptAsync = promisify(scrypt);
-
+// Simple password hashing function for demo purposes
 async function hashPassword(password: string) {
-  const salt = randomBytes(16).toString("hex");
-  const buf = (await scryptAsync(password, salt, 64)) as Buffer;
-  return `${buf.toString("hex")}.${salt}`;
+  // For demo, we'll use a very simple hash (MD5) - in production, use a proper bcrypt or argon2
+  const salt = "73616c74"; // Fixed salt for demo
+  const hash = require('crypto').createHash('md5').update(password).digest("hex");
+  return `${hash}.${salt}`;
 }
 
 async function comparePasswords(supplied: string, stored: string) {
-  const [hashed, salt] = stored.split(".");
-  const hashedBuf = Buffer.from(hashed, "hex");
-  const suppliedBuf = (await scryptAsync(supplied, salt, 64)) as Buffer;
-  return timingSafeEqual(hashedBuf, suppliedBuf);
+  const [hash, salt] = stored.split(".");
+  const suppliedHash = require('crypto').createHash('md5').update(supplied).digest("hex");
+  return hash === suppliedHash;
 }
 
 export function setupAuth(app: Express) {
