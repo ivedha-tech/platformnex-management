@@ -2,8 +2,7 @@ import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import { Express } from "express";
 import session from "express-session";
-import { scrypt, randomBytes, timingSafeEqual } from "crypto";
-import { promisify } from "util";
+import { createHash } from "crypto";
 import { storage } from "./storage";
 import { User as SelectUser } from "@shared/schema";
 
@@ -17,13 +16,13 @@ declare global {
 async function hashPassword(password: string) {
   // For demo, we'll use a very simple hash (MD5) - in production, use a proper bcrypt or argon2
   const salt = "73616c74"; // Fixed salt for demo
-  const hash = require('crypto').createHash('md5').update(password).digest("hex");
+  const hash = createHash('md5').update(password).digest("hex");
   return `${hash}.${salt}`;
 }
 
 async function comparePasswords(supplied: string, stored: string) {
   const [hash, salt] = stored.split(".");
-  const suppliedHash = require('crypto').createHash('md5').update(supplied).digest("hex");
+  const suppliedHash = createHash('md5').update(supplied).digest("hex");
   return hash === suppliedHash;
 }
 
