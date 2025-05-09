@@ -73,8 +73,8 @@ export default function DeveloperExperiencePage() {
         </div>
       </div>
       
-      {/* Key metrics cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7 gap-6 mb-6">
+      {/* Key metrics cards - Two rows of three cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
         <MetricCard
           title="Developer Satisfaction"
           value={89}
@@ -82,7 +82,6 @@ export default function DeveloperExperiencePage() {
           percentageChange={4}
           progress={89}
           suffix="/100"
-          className="xl:col-span-1"
         />
         
         <MetricCard
@@ -91,16 +90,6 @@ export default function DeveloperExperiencePage() {
           percentageChange={12}
           progress={83}
           target={150}
-          className="xl:col-span-1"
-        />
-        
-        <MetricCard
-          title="Task Completion Rate"
-          value="92%"
-          previousValue="94%"
-          percentageChange={-2}
-          progress={92}
-          className="xl:col-span-1"
         />
         
         <MetricCard
@@ -111,15 +100,16 @@ export default function DeveloperExperiencePage() {
           progress={95}
           progressColor="bg-emerald-500"
           target="2 Secs"
-          className="xl:col-span-1"
         />
-        
+      </div>
+      
+      {/* Second row of metric cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
         <MetricCard
           title="Platform Adoption Rate"
           value="78%"
           percentageChange={6}
           progress={78}
-          className="xl:col-span-1"
         />
         
         <MetricCard
@@ -127,7 +117,6 @@ export default function DeveloperExperiencePage() {
           value="65%"
           percentageChange={12}
           progress={65}
-          className="xl:col-span-1"
         />
         
         <MetricCard
@@ -137,7 +126,6 @@ export default function DeveloperExperiencePage() {
           percentageChange={3}
           progress={94}
           progressColor="bg-emerald-500"
-          className="xl:col-span-1"
         />
       </div>
       
