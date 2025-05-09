@@ -15,7 +15,21 @@ import {
   AreaChart,
   Area
 } from "recharts";
-import { MetricCard } from "@/components/ui/metric-card";
+import { KpiCard } from "@/components/ui/kpi-card";
+import { 
+  Shield, 
+  AlertTriangle, 
+  Clock, 
+  Activity,
+  RefreshCw,
+  BadgeCheck,
+  Timer,
+  RotateCcw,
+  PlugZap,
+  GitPullRequest,
+  Link,
+  Users
+} from "lucide-react";
 
 // Sample data for deployments over time
 const deploymentData = [
@@ -59,41 +73,139 @@ export default function OperationsMetricsPage() {
         </p>
       </div>
       
-      {/* Key metrics cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-        <MetricCard
-          title="System Uptime"
-          value="99.97%"
-          previousValue="99.95%"
-          percentageChange={0.02}
-          progress={99.97}
-          progressColor="bg-emerald-500"
-        />
-        
-        <MetricCard
-          title="Avg Response Time"
-          value={1.5}
-          suffix="s"
-          previousValue="1.8s"
-          percentageChange={16.7}
-          progress={90}
-        />
-        
-        <MetricCard
-          title="Deployment Success"
-          value="97.5%"
-          previousValue="95.2%"
-          percentageChange={2.3}
-          progress={97.5}
-        />
-        
-        <MetricCard
-          title="Service Health"
-          value="8"
-          suffix="/8"
-          progress={100}
-          progressColor="bg-emerald-500"
-        />
+      {/* Governance & Compliance KPIs */}
+      <div className="mb-8">
+        <h3 className="text-lg font-medium flex items-center text-blue-700 mb-4">
+          <Shield className="h-5 w-5 mr-2" />
+          Governance & Compliance KPIs
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <KpiCard
+            title="Policy Violation Count"
+            value="14"
+            icon={Shield}
+            iconBgColor="bg-red-50"
+            iconColor="text-red-500"
+            trend={{ value: "3", label: "since last month", isPositive: true }}
+          />
+          
+          <KpiCard
+            title="Drift Detection Events"
+            value="27"
+            icon={AlertTriangle}
+            iconBgColor="bg-green-50"
+            iconColor="text-green-500"
+            trend={{ value: "8", label: "this month", isPositive: true }}
+          />
+          
+          <KpiCard
+            title="Unapproved Deployments"
+            value="5"
+            icon={Clock}
+            iconBgColor="bg-purple-50"
+            iconColor="text-purple-500"
+            trend={{ value: "2", label: "past 30 days", isPositive: true }}
+          />
+          
+          <KpiCard
+            title="Secrets Misconfiguration"
+            value="3"
+            icon={Activity}
+            iconBgColor="bg-green-50"
+            iconColor="text-red-500"
+            trend={{ value: "5", label: "since last quarter", isPositive: true }}
+          />
+        </div>
+      </div>
+      
+      {/* Operational Efficiency KPIs */}
+      <div className="mb-8">
+        <h3 className="text-lg font-medium flex items-center text-blue-700 mb-4">
+          <RefreshCw className="h-5 w-5 mr-2" />
+          Operational Efficiency KPIs
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <KpiCard
+            title="Time to Update Golden Path"
+            value="3.5 days"
+            icon={RefreshCw}
+            iconBgColor="bg-yellow-50"
+            iconColor="text-yellow-500"
+            trend={{ value: "12%", label: "since last quarter", isNegative: true }}
+          />
+          
+          <KpiCard
+            title="Platform Incident MTTR"
+            value="47 min"
+            icon={Timer}
+            iconBgColor="bg-red-50"
+            iconColor="text-red-500"
+            trend={{ value: "15%", label: "since last month", isPositive: true }}
+          />
+          
+          <KpiCard
+            title="Deployment Success Rate"
+            value="94.2%"
+            icon={BadgeCheck}
+            iconBgColor="bg-green-50"
+            iconColor="text-green-500"
+            trend={{ value: "3.1%", label: "since last month", isPositive: true }}
+          />
+          
+          <KpiCard
+            title="Rollback Frequency"
+            value="8"
+            icon={RotateCcw}
+            iconBgColor="bg-red-50"
+            iconColor="text-red-500"
+            trend={{ value: "2", label: "monthly average", isPositive: true }}
+          />
+        </div>
+      </div>
+      
+      {/* Plugin & Ecosystem KPIs */}
+      <div className="mb-8">
+        <h3 className="text-lg font-medium flex items-center text-blue-700 mb-4">
+          <PlugZap className="h-5 w-5 mr-2" />
+          Plugin & Ecosystem KPIs
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <KpiCard
+            title="Total Plugins"
+            value="48"
+            icon={PlugZap}
+            iconBgColor="bg-blue-50"
+            iconColor="text-blue-500"
+            trend={{ value: "5", label: "since last quarter", isPositive: true }}
+          />
+          
+          <KpiCard
+            title="Top 3 Tools Consumed via Platform"
+            value="GitHub, Pager Duty, Sonar Q"
+            valueClassName="text-base"
+            icon={GitPullRequest}
+            iconBgColor="bg-blue-50"
+            iconColor="text-blue-500"
+          />
+          
+          <KpiCard
+            title="Time to Integrate New Plugin"
+            value="8 Days"
+            icon={Link}
+            iconBgColor="bg-yellow-50"
+            iconColor="text-yellow-500"
+            trend={{ value: "-10%", label: "since last quarter", isNegative: true }}
+          />
+          
+          <KpiCard
+            title="Community Contributions"
+            value="23"
+            icon={Users}
+            iconBgColor="bg-blue-50"
+            iconColor="text-blue-500"
+            trend={{ value: "24%", label: "year-to-date", isPositive: true }}
+          />
+        </div>
       </div>
       
       {/* Main metrics dashboard */}
