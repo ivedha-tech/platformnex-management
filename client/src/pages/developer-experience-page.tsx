@@ -31,11 +31,14 @@ const platformUsageData = [
   { name: "Sun", developers: 60 },
 ];
 
-// Sample data for task distribution
+// Task distribution data with new categories
 const taskDistributionData = [
-  { name: "CI/CD Pipeline", value: 65, color: "#1565C0" },
-  { name: "API Creation", value: 15, color: "#0097A7" },
-  { name: "Other Tasks", value: 20, color: "#FFA000" },
+  { name: "Build & Deploy", value: 28, color: "#1565C0" },
+  { name: "Reliability", value: 21, color: "#0097A7" },
+  { name: "Verify", value: 15, color: "#FFA000" },
+  { name: "Cloud Operations", value: 18, color: "#43A047" },
+  { name: "FinOps", value: 8, color: "#7B1FA2" },
+  { name: "Security", value: 10, color: "#D32F2F" },
 ];
 
 export default function DeveloperExperiencePage() {
@@ -193,11 +196,17 @@ export default function DeveloperExperiencePage() {
                 comment={item.comment}
                 category={item.category}
                 categoryColor={
-                  item.category === "CI/CD Pipeline" 
-                    ? "bg-primary-100 text-primary-800" 
-                    : item.category === "API Creation"
+                  item.category === "Build & Deploy" 
+                    ? "bg-blue-100 text-blue-800" 
+                    : item.category === "Reliability"
                       ? "bg-cyan-100 text-cyan-800"
-                      : "bg-amber-100 text-amber-800"
+                      : item.category === "Verify"
+                        ? "bg-amber-100 text-amber-800"
+                        : item.category === "Cloud Operations"
+                          ? "bg-green-100 text-green-800"
+                          : item.category === "FinOps"
+                            ? "bg-purple-100 text-purple-800"
+                            : "bg-red-100 text-red-800" // Security
                 }
               />
             ))

@@ -176,15 +176,15 @@ export class MemStorage implements IStorage {
       {
         userId: 1,
         rating: 4,
-        comment: "The CI/CD pipeline templates are very useful, but I'd like to see more customization options for deployment strategies.",
-        category: "CI/CD Pipeline",
+        comment: "The deployment templates are very useful, but I'd like to see more customization options for deployment strategies.",
+        category: "Build & Deploy",
         date: new Date(Date.now() - 7200000) // 2 hours ago
       },
       {
         userId: 1,
         rating: 5,
-        comment: "The API configuration tool has significantly reduced our development time. Great job on the latest updates!",
-        category: "API Creation",
+        comment: "The reliability testing tools have significantly reduced our incident rates. Great job on the latest updates!",
+        category: "Reliability",
         date: new Date(Date.now() - 86400000) // 1 day ago
       },
       {
@@ -193,6 +193,27 @@ export class MemStorage implements IStorage {
         comment: "The security scanning feature works well but occasionally gives false positives. Would be nice to have more configuration options.",
         category: "Security",
         date: new Date(Date.now() - 2 * 86400000) // 2 days ago
+      },
+      {
+        userId: 1,
+        rating: 4,
+        comment: "The verification pipeline is excellent but could use better integration with our testing frameworks.",
+        category: "Verify",
+        date: new Date(Date.now() - 3 * 86400000) // 3 days ago
+      },
+      {
+        userId: 1,
+        rating: 5,
+        comment: "The cloud operations dashboard provides great visibility into our infrastructure. Very intuitive!",
+        category: "Cloud Operations",
+        date: new Date(Date.now() - 4 * 86400000) // 4 days ago
+      },
+      {
+        userId: 1,
+        rating: 4,
+        comment: "The cost optimization recommendations from FinOps have helped us reduce cloud spend by 20%.",
+        category: "FinOps",
+        date: new Date(Date.now() - 5 * 86400000) // 5 days ago
       }
     ];
     
