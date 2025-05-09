@@ -37,13 +37,13 @@
   --chart-5: 38 92% 50%;   /* Warning */
   
   /* Sidebar */
-  --sidebar-background: 221 83% 53%; /* Blue background */
+  --sidebar-background: 221 70% 25%; /* Darker blue background */
   --sidebar-foreground: 0 0% 100%; /* White text */
   --sidebar-primary: 0 0% 100%; /* White primary */
   --sidebar-primary-foreground: 0 0% 100%; /* White text */
   --sidebar-accent: 0 0% 100%; /* White accent */
   --sidebar-accent-foreground: 0 0% 100%; /* White text */
-  --sidebar-border: 221 70% 45%; /* Darker blue border */
+  --sidebar-border: 221 70% 20%; /* Darker blue border */
   --sidebar-ring: 0 0% 100%; /* White ring */
 }
 
@@ -82,13 +82,13 @@
   --chart-5: 38 92% 50%;   /* Warning */
   
   /* Sidebar */
-  --sidebar-background: 221 83% 53%; /* Blue background */
+  --sidebar-background: 221 70% 25%; /* Darker blue background */
   --sidebar-foreground: 0 0% 100%; /* White text */
   --sidebar-primary: 0 0% 100%; /* White primary */
   --sidebar-primary-foreground: 0 0% 100%; /* White text */
   --sidebar-accent: 0 0% 100%; /* White accent */
   --sidebar-accent-foreground: 0 0% 100%; /* White text */
-  --sidebar-border: 221 70% 45%; /* Darker blue border */
+  --sidebar-border: 221 70% 20%; /* Darker blue border */
   --sidebar-ring: 0 0% 100%; /* White ring */
 }
 
