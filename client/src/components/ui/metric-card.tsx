@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { LucideIcon } from "lucide-react";
 
 interface MetricCardProps {
   title: string;
@@ -12,6 +13,8 @@ interface MetricCardProps {
   target?: string | number;
   progressColor?: string;
   className?: string;
+  icon?: LucideIcon;
+  iconColor?: string;
 }
 
 export function MetricCard({
@@ -24,6 +27,8 @@ export function MetricCard({
   target,
   progressColor = "bg-primary",
   className,
+  icon: Icon,
+  iconColor = "text-primary",
 }: MetricCardProps) {
   const isPositiveChange = percentageChange && percentageChange > 0;
   
@@ -31,7 +36,10 @@ export function MetricCard({
     <Card className={className}>
       <CardContent className="pt-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-medium text-gray-500">{title}</h3>
+          <div className="flex items-center">
+            {Icon && <Icon className={cn("h-5 w-5 mr-2", iconColor)} />}
+            <h3 className="text-sm font-medium text-gray-500">{title}</h3>
+          </div>
           {percentageChange !== undefined && (
             <span className={cn(
               "flex items-center text-xs",

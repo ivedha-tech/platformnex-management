@@ -6,7 +6,15 @@ import { FeedbackItem } from "@/components/ui/feedback-item";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Download } from "lucide-react";
+import { 
+  Download, 
+  Heart, 
+  Users, 
+  Timer, 
+  BarChart, 
+  GitBranch, 
+  UserCheck
+} from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -82,6 +90,8 @@ export default function DeveloperExperiencePage() {
           percentageChange={4}
           progress={89}
           suffix="/100"
+          icon={Heart}
+          iconColor="text-red-500"
         />
         
         <MetricCard
@@ -90,6 +100,8 @@ export default function DeveloperExperiencePage() {
           percentageChange={12}
           progress={83}
           target={150}
+          icon={Users}
+          iconColor="text-blue-500"
         />
         
         <MetricCard
@@ -100,6 +112,8 @@ export default function DeveloperExperiencePage() {
           progress={95}
           progressColor="bg-emerald-500"
           target="2 Secs"
+          icon={Timer}
+          iconColor="text-purple-500"
         />
       </div>
       
@@ -111,6 +125,8 @@ export default function DeveloperExperiencePage() {
           percentageChange={6}
           progress={78}
           target="80%"
+          icon={BarChart}
+          iconColor="text-amber-500"
         />
         
         <MetricCard
@@ -120,6 +136,8 @@ export default function DeveloperExperiencePage() {
           progress={65}
           target="60%"
           progressColor="bg-emerald-500"
+          icon={GitBranch}
+          iconColor="text-emerald-500"
         />
         
         <MetricCard
@@ -129,6 +147,8 @@ export default function DeveloperExperiencePage() {
           percentageChange={3}
           progress={94}
           progressColor="bg-emerald-500"
+          icon={UserCheck}
+          iconColor="text-cyan-500"
         />
       </div>
       
