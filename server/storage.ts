@@ -67,7 +67,7 @@ export class MemStorage implements IStorage {
     this.users.set(this.userId, {
       id: this.userId++,
       username: "admin",
-      password: "5d41402abc4b2a76b9719d911017c592.73616c74", // hashed "admin123" with our system
+      password: "0192023a7bbd73250516f069df18b500.73616c74", // hashed "admin123" with our system
       email: "admin@platformnex.com",
       role: "admin",
       firstName: "Admin",
