@@ -36,17 +36,17 @@ function SidebarLink({ href, icon, children, currentPath, onClick }: SidebarLink
       <Link href={href}>
         <div
           className={cn(
-            "flex items-center px-4 py-2 text-sm rounded-md group transition-colors hover:bg-primary-50 hover:text-primary-700 dark:hover:bg-gray-800 cursor-pointer",
+            "flex items-center px-4 py-2 text-sm rounded-md group transition-colors cursor-pointer text-sidebar-foreground hover:bg-white/10",
             isActive
-              ? "bg-primary-50 text-primary-700 border-l-2 border-primary-700 dark:bg-gray-800 dark:text-primary-400 dark:border-primary-400"
-              : "text-gray-700 dark:text-gray-300"
+              ? "bg-white/20 border-l-2 border-sidebar-foreground font-medium"
+              : ""
           )}
         >
           <div className={cn(
-            "mr-3 h-5 w-5",
+            "mr-3 h-5 w-5 text-sidebar-foreground",
             isActive
-              ? "text-primary-700 dark:text-primary-400"
-              : "text-gray-500 dark:text-gray-400 group-hover:text-primary-700 dark:group-hover:text-primary-400"
+              ? "opacity-100" 
+              : "opacity-80 group-hover:opacity-100"
           )}>
             {icon}
           </div>
@@ -85,7 +85,7 @@ export function Sidebar({ className }: SidebarProps) {
       <div className="md:hidden fixed z-50 top-0 left-0 p-4">
         <button
           onClick={toggleSidebar}
-          className="flex items-center justify-center h-10 w-10 rounded-md bg-white shadow-md text-gray-700 focus:outline-none"
+          className="flex items-center justify-center h-10 w-10 rounded-md bg-sidebar shadow-md text-sidebar-foreground focus:outline-none"
           aria-label="Toggle menu"
         >
           {isOpen ? <X size={20} /> : <Menu size={20} />}
@@ -103,20 +103,20 @@ export function Sidebar({ className }: SidebarProps) {
       {/* Sidebar */}
       <aside
         className={cn(
-          "w-64 bg-white dark:bg-gray-900 shadow-md fixed md:sticky top-0 bottom-0 left-0 z-40 flex flex-col h-screen transition-transform duration-300 ease-in-out",
+          "w-64 bg-sidebar shadow-md fixed md:sticky top-0 bottom-0 left-0 z-40 flex flex-col h-screen transition-transform duration-300 ease-in-out",
           isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0",
           className
         )}
       >
-        <div className="p-6 border-b border-gray-100 dark:border-gray-800">
-          <h1 className="text-lg font-semibold text-gray-900 dark:text-white">PlatformNEX</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Management Portal</p>
+        <div className="p-6 border-b border-sidebar-border">
+          <h1 className="text-lg font-semibold text-sidebar-foreground">PlatformNEX</h1>
+          <p className="text-sm text-sidebar-foreground opacity-80">Management Portal</p>
         </div>
 
         <nav className="flex-1 overflow-y-auto py-4">
           {/* Overview Section */}
           <div className="px-4 mb-4">
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
+            <p className="text-xs font-semibold text-sidebar-foreground uppercase tracking-wider mb-2">
               Overview
             </p>
             <ul className="space-y-1">
@@ -155,7 +155,7 @@ export function Sidebar({ className }: SidebarProps) {
 
           {/* Management Section */}
           <div className="px-4 mb-4">
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
+            <p className="text-xs font-semibold text-sidebar-foreground uppercase tracking-wider mb-2">
               Management
             </p>
             <ul className="space-y-1">
@@ -194,7 +194,7 @@ export function Sidebar({ className }: SidebarProps) {
 
           {/* Administration Section */}
           <div className="px-4 mb-4">
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
+            <p className="text-xs font-semibold text-sidebar-foreground uppercase tracking-wider mb-2">
               Administration
             </p>
             <ul className="space-y-1">
@@ -232,31 +232,31 @@ export function Sidebar({ className }: SidebarProps) {
           </div>
         </nav>
 
-        <div className="p-4 border-t border-gray-100 dark:border-gray-800">
+        <div className="p-4 border-t border-sidebar-border">
           <div className="flex items-center">
-            <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-800">
+            <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-sidebar-foreground">
               <span className="text-xs font-medium">
                 {user?.firstName?.[0] || user?.username?.[0] || 'U'}
               </span>
             </div>
             <div className="ml-3">
-              <p className="text-sm font-medium text-gray-800 dark:text-white">
+              <p className="text-sm font-medium text-sidebar-foreground">
                 {user?.firstName && user?.lastName
                   ? `${user.firstName} ${user.lastName}`
                   : user?.username || 'User'}
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-sidebar-foreground opacity-80">
                 {user?.role === 'admin' ? 'Platform Administrator' : 'Platform Engineer'}
               </p>
             </div>
           </div>
           
-          <Separator className="my-4" />
+          <Separator className="my-4 bg-sidebar-border" />
           
           <Button
             variant="ghost"
             size="sm"
-            className="w-full justify-start text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+            className="w-full justify-start text-sidebar-foreground hover:bg-white/10"
             onClick={handleLogout}
             disabled={logoutMutation.isPending}
           >
