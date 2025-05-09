@@ -110,6 +110,7 @@ export default function DeveloperExperiencePage() {
           value="78%"
           percentageChange={6}
           progress={78}
+          target="80%"
         />
         
         <MetricCard
@@ -117,6 +118,8 @@ export default function DeveloperExperiencePage() {
           value="65%"
           percentageChange={12}
           progress={65}
+          target="60%"
+          progressColor="bg-emerald-500"
         />
         
         <MetricCard
