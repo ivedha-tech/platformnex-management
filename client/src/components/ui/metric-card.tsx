@@ -78,11 +78,6 @@ export function MetricCard({
                 <span className="text-xs text-gray-500">
                   Target: {target}
                 </span>
-                {progress !== undefined && (
-                  <span className="text-xs font-medium text-gray-700">
-                    {progress}%
-                  </span>
-                )}
               </div>
             )}
             
