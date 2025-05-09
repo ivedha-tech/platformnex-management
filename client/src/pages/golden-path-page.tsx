@@ -179,6 +179,9 @@ export default function GoldenPathPage() {
                           <SelectItem value="API">API</SelectItem>
                           <SelectItem value="Security">Security</SelectItem>
                           <SelectItem value="Infrastructure">Infrastructure</SelectItem>
+                          <SelectItem value="Application">Application</SelectItem>
+                          <SelectItem value="Data">Data</SelectItem>
+                          <SelectItem value="AI/ML">AI/ML</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -219,12 +222,15 @@ export default function GoldenPathPage() {
       </div>
       
       <Tabs defaultValue="all" className="space-y-6">
-        <TabsList>
+        <TabsList className="flex flex-wrap">
           <TabsTrigger value="all">All Templates</TabsTrigger>
           <TabsTrigger value="cicd">CI/CD</TabsTrigger>
           <TabsTrigger value="orchestration">Orchestration</TabsTrigger>
           <TabsTrigger value="api">API</TabsTrigger>
           <TabsTrigger value="security">Security</TabsTrigger>
+          <TabsTrigger value="application">Application</TabsTrigger>
+          <TabsTrigger value="data">Data</TabsTrigger>
+          <TabsTrigger value="aiml">AI/ML</TabsTrigger>
         </TabsList>
         
         <TabsContent value="all">
@@ -352,6 +358,153 @@ export default function GoldenPathPage() {
         <TabsContent value="security">
           <div className="text-center py-12 text-gray-500">
             Security templates would be filtered here
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="application">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {isLoading ? (
+              <div className="col-span-full text-center py-12 text-gray-500">
+                Loading templates...
+              </div>
+            ) : filteredTemplates?.filter((t: any) => t.category === "Application").length > 0 ? (
+              filteredTemplates
+                .filter((t: any) => t.category === "Application")
+                .map((template: any, index: number) => (
+                  <Card key={index} className="overflow-hidden">
+                    <CardHeader className="pb-3">
+                      <div className="flex justify-between items-start">
+                        <Badge className="mb-2">{template.category}</Badge>
+                        <div className="flex space-x-1">
+                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500">
+                            <Trash className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      <CardTitle>{template.name}</CardTitle>
+                      <CardDescription className="line-clamp-2">
+                        {template.description}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="pb-3">
+                      <div className="flex justify-between text-sm text-gray-500">
+                        <span>Created {format(new Date(template.createdAt), "MMM d, yyyy")}</span>
+                        <span>Updated {format(new Date(template.updatedAt), "MMM d, yyyy")}</span>
+                      </div>
+                    </CardContent>
+                    <div className="px-6 pb-4">
+                      <Button variant="outline" className="w-full">
+                        View Details
+                      </Button>
+                    </div>
+                  </Card>
+                ))
+            ) : (
+              <div className="col-span-full text-center py-12 text-gray-500">
+                No Application templates found.
+              </div>
+            )}
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="data">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {isLoading ? (
+              <div className="col-span-full text-center py-12 text-gray-500">
+                Loading templates...
+              </div>
+            ) : filteredTemplates?.filter((t: any) => t.category === "Data").length > 0 ? (
+              filteredTemplates
+                .filter((t: any) => t.category === "Data")
+                .map((template: any, index: number) => (
+                  <Card key={index} className="overflow-hidden">
+                    <CardHeader className="pb-3">
+                      <div className="flex justify-between items-start">
+                        <Badge className="mb-2">{template.category}</Badge>
+                        <div className="flex space-x-1">
+                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500">
+                            <Trash className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      <CardTitle>{template.name}</CardTitle>
+                      <CardDescription className="line-clamp-2">
+                        {template.description}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="pb-3">
+                      <div className="flex justify-between text-sm text-gray-500">
+                        <span>Created {format(new Date(template.createdAt), "MMM d, yyyy")}</span>
+                        <span>Updated {format(new Date(template.updatedAt), "MMM d, yyyy")}</span>
+                      </div>
+                    </CardContent>
+                    <div className="px-6 pb-4">
+                      <Button variant="outline" className="w-full">
+                        View Details
+                      </Button>
+                    </div>
+                  </Card>
+                ))
+            ) : (
+              <div className="col-span-full text-center py-12 text-gray-500">
+                No Data templates found.
+              </div>
+            )}
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="aiml">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {isLoading ? (
+              <div className="col-span-full text-center py-12 text-gray-500">
+                Loading templates...
+              </div>
+            ) : filteredTemplates?.filter((t: any) => t.category === "AI/ML").length > 0 ? (
+              filteredTemplates
+                .filter((t: any) => t.category === "AI/ML")
+                .map((template: any, index: number) => (
+                  <Card key={index} className="overflow-hidden">
+                    <CardHeader className="pb-3">
+                      <div className="flex justify-between items-start">
+                        <Badge className="mb-2">{template.category}</Badge>
+                        <div className="flex space-x-1">
+                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500">
+                            <Trash className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      <CardTitle>{template.name}</CardTitle>
+                      <CardDescription className="line-clamp-2">
+                        {template.description}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="pb-3">
+                      <div className="flex justify-between text-sm text-gray-500">
+                        <span>Created {format(new Date(template.createdAt), "MMM d, yyyy")}</span>
+                        <span>Updated {format(new Date(template.updatedAt), "MMM d, yyyy")}</span>
+                      </div>
+                    </CardContent>
+                    <div className="px-6 pb-4">
+                      <Button variant="outline" className="w-full">
+                        View Details
+                      </Button>
+                    </div>
+                  </Card>
+                ))
+            ) : (
+              <div className="col-span-full text-center py-12 text-gray-500">
+                No AI/ML templates found.
+              </div>
+            )}
           </div>
         </TabsContent>
       </Tabs>

@@ -311,6 +311,71 @@ export class MemStorage implements IStorage {
         createdAt: new Date(Date.now() - 15 * 86400000), // 15 days ago
         updatedAt: new Date(Date.now() - 15 * 86400000), // 15 days ago
         isActive: true
+      },
+      {
+        name: "Microservice Template",
+        description: "A complete template for building scalable microservices with service discovery and tracing",
+        category: "Application",
+        content: JSON.stringify({
+          components: ["api", "service", "repository", "messaging"],
+          configuration: ["circuit-breaker", "timeout", "retry", "metrics"],
+        }),
+        createdBy: 1,
+        createdAt: new Date(Date.now() - 12 * 86400000), // 12 days ago
+        updatedAt: new Date(Date.now() - 3 * 86400000), // 3 days ago
+        isActive: true
+      },
+      {
+        name: "Data Pipeline",
+        description: "An end-to-end data pipeline with ingestion, transformation, validation, and storage",
+        category: "Data",
+        content: JSON.stringify({
+          stages: ["ingest", "clean", "transform", "validate", "load"],
+          tools: ["Apache Spark", "Airflow", "Kafka"],
+        }),
+        createdBy: 1,
+        createdAt: new Date(Date.now() - 10 * 86400000), // 10 days ago
+        updatedAt: new Date(Date.now() - 1 * 86400000), // 1 day ago
+        isActive: true
+      },
+      {
+        name: "Database Service",
+        description: "Template for database service with connection pooling, migrations, and schema management",
+        category: "Data",
+        content: JSON.stringify({
+          features: ["connection-pool", "migrations", "schema-validation", "query-layer"],
+          databases: ["PostgreSQL", "MySQL", "MongoDB"],
+        }),
+        createdBy: 1,
+        createdAt: new Date(Date.now() - 8 * 86400000), // 8 days ago
+        updatedAt: new Date(Date.now() - 1 * 86400000), // 1 day ago
+        isActive: true
+      },
+      {
+        name: "Machine Learning Model",
+        description: "Template for deploying ML models with monitoring, versioning, and A/B testing",
+        category: "AI/ML",
+        content: JSON.stringify({
+          components: ["model-service", "feature-store", "experiment-tracker", "monitoring"],
+          ml_frameworks: ["TensorFlow", "PyTorch", "scikit-learn"],
+        }),
+        createdBy: 1,
+        createdAt: new Date(Date.now() - 7 * 86400000), // 7 days ago
+        updatedAt: new Date(Date.now() - 1 * 86400000), // 1 day ago
+        isActive: true
+      },
+      {
+        name: "Web Application",
+        description: "Template for modern web applications with SSR, authentication, and state management",
+        category: "Application",
+        content: JSON.stringify({
+          frontend: ["components", "state", "routing", "api-client"],
+          backend: ["api", "auth", "database", "caching"],
+        }),
+        createdBy: 1,
+        createdAt: new Date(Date.now() - 5 * 86400000), // 5 days ago
+        updatedAt: new Date(Date.now() - 1 * 86400000), // 1 day ago
+        isActive: true
       }
     ];
     
