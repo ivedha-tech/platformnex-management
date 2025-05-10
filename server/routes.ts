@@ -91,6 +91,83 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get all plugin updates
+  app.get("/api/plugins", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    try {
+      const updates = await storage.getPluginUpdates();
+      res.json(updates);
+    } catch (err) {
+      res.status(500).json({ message: "Failed to fetch plugin updates" });
+    }
+  });
+
+  // Get plugin updates by domain
+  app.get("/api/plugins/domain/:domain", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    try {
+      const { domain } = req.params;
+      const updates = await storage.getPluginUpdatesByDomain(domain);
+      res.json(updates);
+    } catch (err) {
+      res.status(500).json({ message: "Failed to fetch plugin updates by domain" });
+    }
+  });
+
+  // Create a new plugin update
+  app.post("/api/plugins", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    try {
+      // Check if user has admin role
+      if (req.user?.role !== "admin") {
+        return res.status(403).json({ message: "Unauthorized: Admin role required" });
+      }
+      
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
+      const pluginUpdate = await storage.createPluginUpdate({
+        ...req.body,
+        updatedBy: userId,
+        updatedAt: new Date(),
+      });
+      
+      res.status(201).json(pluginUpdate);
+    } catch (err) {
+      res.status(500).json({ message: "Failed to create plugin update" });
+    }
+  });
+
+  // Update plugin status
+  app.patch("/api/plugins/:id/status", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    try {
+      // Check if user has admin role
+      if (req.user?.role !== "admin") {
+        return res.status(403).json({ message: "Unauthorized: Admin role required" });
+      }
+      
+      const { id } = req.params;
+      const { status } = req.body;
+      
+      if (!status) {
+        return res.status(400).json({ message: "Status is required" });
+      }
+      
+      const updatedPlugin = await storage.updatePluginStatus(parseInt(id), status);
+      
+      if (!updatedPlugin) {
+        return res.status(404).json({ message: "Plugin update not found" });
+      }
+      
+      res.json(updatedPlugin);
+    } catch (err) {
+      res.status(500).json({ message: "Failed to update plugin status" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

@@ -66,6 +66,19 @@ export const goldenPathTemplate = pgTable("golden_path_template", {
   isActive: boolean("is_active").notNull().default(true),
 });
 
+export const pluginUpdate = pgTable("plugin_update", {
+  id: serial("id").primaryKey(),
+  domain: text("domain").notNull(),
+  name: text("name").notNull(),
+  version: text("version").notNull(),
+  releaseDate: timestamp("release_date").notNull(),
+  status: text("status").notNull(),
+  description: text("description").notNull(),
+  changeLog: text("change_log").notNull(),
+  updatedBy: integer("updated_by").notNull(),
+  updatedAt: timestamp("updated_at").notNull(),
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type LoginUser = z.infer<typeof loginUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -73,3 +86,4 @@ export type DeveloperMetric = typeof developerMetrics.$inferSelect;
 export type Feedback = typeof feedback.$inferSelect;
 export type ActivityLog = typeof activityLog.$inferSelect;
 export type GoldenPathTemplate = typeof goldenPathTemplate.$inferSelect;
+export type PluginUpdate = typeof pluginUpdate.$inferSelect;
