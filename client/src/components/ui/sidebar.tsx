@@ -179,16 +179,7 @@ export function Sidebar({ className }: SidebarProps) {
                   Orchestrator Config
                 </SidebarLink>
               </li>
-              <li>
-                <SidebarLink
-                  href="/flow-control"
-                  icon={<Network />}
-                  currentPath={location}
-                  onClick={() => setIsOpen(false)}
-                >
-                  Execution Flow Control
-                </SidebarLink>
-              </li>
+              {/* Flow Control has been merged into Golden Path & Templates */}
             </ul>
           </div>
 
