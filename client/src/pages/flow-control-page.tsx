@@ -29,30 +29,30 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
-// FlowStage component for individual stages in the workflow
-interface FlowStageProps {
+// FlowConfigStage component for individual stages in the workflow configuration
+interface FlowConfigStageProps {
   name: string;
-  status: "completed" | "active" | "pending" | "failed";
+  status: "configured" | "active" | "pending" | "disabled";
   index: number;
   isLast?: boolean;
 }
 
-function FlowStage({ name, status, index, isLast = false }: FlowStageProps) {
+function FlowConfigStage({ name, status, index, isLast = false }: FlowConfigStageProps) {
   const getStatusColor = () => {
     switch (status) {
-      case "completed": return "bg-green-500 text-white";
+      case "configured": return "bg-green-500 text-white";
       case "active": return "bg-blue-500 text-white";
       case "pending": return "bg-gray-300 text-gray-700";
-      case "failed": return "bg-red-500 text-white";
+      case "disabled": return "bg-red-100 text-red-700";
     }
   };
   
   const getStatusIcon = () => {
     switch (status) {
-      case "completed": return <CheckCircle className="h-5 w-5" />;
-      case "active": return <Clock className="h-5 w-5 animate-pulse" />;
+      case "configured": return <CheckCircle className="h-5 w-5" />;
+      case "active": return <Settings className="h-5 w-5" />;
       case "pending": return <Clock className="h-5 w-5" />;
-      case "failed": return <XCircle className="h-5 w-5" />;
+      case "disabled": return <StopCircle className="h-5 w-5" />;
     }
   };
   
@@ -69,8 +69,8 @@ function FlowStage({ name, status, index, isLast = false }: FlowStageProps) {
         <div className="flex-1 mx-4">
           <div className="h-0.5 bg-gray-200 relative">
             <div 
-              className={`absolute inset-0 ${status === "completed" ? "bg-green-500" : "bg-gray-200"}`}
-              style={{ width: status === "completed" ? "100%" : "0%" }}
+              className={`absolute inset-0 ${status === "configured" ? "bg-green-500" : "bg-gray-200"}`}
+              style={{ width: status === "configured" ? "100%" : "0%" }}
             ></div>
           </div>
         </div>
@@ -79,26 +79,26 @@ function FlowStage({ name, status, index, isLast = false }: FlowStageProps) {
   );
 }
 
-// FlowCard component for workflow cards
-interface FlowCardProps {
+// FlowConfigCard component for workflow configuration cards
+interface FlowConfigCardProps {
   title: string;
   description: string;
-  status: "active" | "paused" | "completed" | "failed";
-  lastRun: string;
+  status: "enabled" | "disabled" | "draft" | "deprecated";
+  lastUpdated: string;
   type: string;
 }
 
-function FlowCard({ title, description, status, lastRun, type }: FlowCardProps) {
+function FlowConfigCard({ title, description, status, lastUpdated, type }: FlowConfigCardProps) {
   const getStatusBadge = () => {
     switch (status) {
-      case "active": 
-        return <Badge className="bg-green-100 text-green-800">Active</Badge>;
-      case "paused": 
-        return <Badge className="bg-amber-100 text-amber-800">Paused</Badge>;
-      case "completed": 
-        return <Badge className="bg-blue-100 text-blue-800">Completed</Badge>;
-      case "failed": 
-        return <Badge className="bg-red-100 text-red-800">Failed</Badge>;
+      case "enabled": 
+        return <Badge className="bg-green-100 text-green-800">Enabled</Badge>;
+      case "disabled": 
+        return <Badge className="bg-amber-100 text-amber-800">Disabled</Badge>;
+      case "draft": 
+        return <Badge className="bg-blue-100 text-blue-800">Draft</Badge>;
+      case "deprecated": 
+        return <Badge className="bg-red-100 text-red-800">Deprecated</Badge>;
     }
   };
   
@@ -114,7 +114,7 @@ function FlowCard({ title, description, status, lastRun, type }: FlowCardProps) 
       </CardHeader>
       <CardContent className="pb-3">
         <div className="text-sm text-gray-500">
-          Last run: {lastRun}
+          Last updated: {lastUpdated}
         </div>
       </CardContent>
       <div className="bg-gray-50 px-6 py-3 flex justify-between">
@@ -132,104 +132,103 @@ function FlowCard({ title, description, status, lastRun, type }: FlowCardProps) 
 }
 
 export default function FlowControlPage() {
-  const [activeTab, setActiveTab] = useState("active");
+  const [activeTab, setActiveTab] = useState("enabled");
   
-  // Sample flow execution data
-  const flowExecutions = [
+  // Sample flow configuration data
+  const flowConfigs = [
     {
       id: 1,
-      title: "CI/CD Pipeline for Frontend",
-      description: "Automated build, test and deployment pipeline for the frontend application",
-      status: "active" as const,
-      lastRun: "Today, 10:23 AM",
+      title: "CI/CD Workflow Configuration",
+      description: "Configuration for CI/CD processes including build, test, and deployment stages",
+      status: "enabled" as const,
+      lastUpdated: "Today, 10:23 AM",
       type: "CI/CD",
     },
     {
       id: 2,
-      title: "API Gateway Deployment",
-      description: "Flow for deploying updates to the API gateway including configuration validation",
-      status: "completed" as const,
-      lastRun: "Yesterday, 3:45 PM",
-      type: "Deployment",
+      title: "API Gateway Configuration",
+      description: "Settings for API gateway including routing, throttling, and authentication",
+      status: "enabled" as const,
+      lastUpdated: "Yesterday, 3:45 PM",
+      type: "API",
     },
     {
       id: 3,
-      title: "Database Migration",
-      description: "Controlled process for applying database schema updates with rollback capability",
-      status: "paused" as const,
-      lastRun: "Sep 15, 2023",
-      type: "Migration",
+      title: "Database Backup Policy",
+      description: "Configuration for database backup schedules, retention policies and storage locations",
+      status: "disabled" as const,
+      lastUpdated: "Sep 15, 2023",
+      type: "Database",
     },
     {
       id: 4,
-      title: "Security Scanning",
-      description: "Automated security vulnerability scanning for container images",
-      status: "failed" as const,
-      lastRun: "Sep 12, 2023",
+      title: "Security Scanning Configuration",
+      description: "Settings for security vulnerability scanning with customizable rule sets",
+      status: "draft" as const,
+      lastUpdated: "Sep 12, 2023",
       type: "Security",
     },
     {
       id: 5,
-      title: "Microservice Deployment",
-      description: "Coordinated deployment of microservices with dependency management",
-      status: "active" as const,
-      lastRun: "Today, 9:10 AM",
+      title: "Microservice Deployment Config",
+      description: "Configuration for microservice deployments including dependency chains and health checks",
+      status: "enabled" as const,
+      lastUpdated: "Today, 9:10 AM",
       type: "Deployment",
     },
     {
       id: 6,
-      title: "Data Backup Process",
-      description: "Scheduled backup process for all production databases",
-      status: "completed" as const,
-      lastRun: "Today, 2:00 AM",
-      type: "Backup",
+      title: "Service Mesh Configuration",
+      description: "Service mesh settings for service discovery, load balancing and circuit breaking",
+      status: "deprecated" as const,
+      lastUpdated: "Today, 2:00 AM",
+      type: "Infrastructure",
     },
   ];
   
-  // Selected flow details (would typically come from an API based on selection)
-  const selectedFlow = {
+  // Selected flow configuration details (would typically come from an API based on selection)
+  const selectedConfig = {
     id: 1,
-    title: "CI/CD Pipeline for Frontend",
-    description: "Automated build, test and deployment pipeline for the frontend application",
-    status: "active" as const,
-    lastRun: "Today, 10:23 AM",
+    title: "CI/CD Workflow Configuration",
+    description: "Configuration for CI/CD processes including build, test, and deployment stages",
+    status: "enabled" as const,
+    lastUpdated: "Today, 10:23 AM",
     stages: [
-      { name: "Code Checkout", status: "completed" as const },
-      { name: "Build", status: "completed" as const },
-      { name: "Unit Tests", status: "completed" as const },
+      { name: "Code Checkout", status: "configured" as const },
+      { name: "Build", status: "configured" as const },
+      { name: "Unit Tests", status: "configured" as const },
       { name: "Integration Tests", status: "active" as const },
       { name: "Security Scan", status: "pending" as const },
       { name: "Deploy to Staging", status: "pending" as const },
-      { name: "UI Tests", status: "pending" as const },
-      { name: "Deploy to Production", status: "pending" as const },
+      { name: "UI Tests", status: "disabled" as const },
+      { name: "Deploy to Production", status: "disabled" as const },
     ],
-    executionTime: "10:23",
-    executionBy: "CI System",
-    nextStage: "Integration Tests",
+    modifiedBy: "Admin User",
+    nextReview: "Jun 15, 2025",
   };
   
-  // Filter flows based on active tab
-  const filteredFlows = activeTab === "all" 
-    ? flowExecutions 
-    : flowExecutions.filter(flow => flow.status === activeTab);
+  // Filter configurations based on active tab
+  const filteredConfigs = activeTab === "all" 
+    ? flowConfigs 
+    : flowConfigs.filter(config => config.status === activeTab);
   
   return (
     <DashboardLayout title="Execution Flow Control">
       <div className="mb-6">
-        <h2 className="text-2xl font-semibold text-gray-900">Execution Flow Control</h2>
+        <h2 className="text-2xl font-semibold text-gray-900">PlatformNEX Configuration</h2>
         <p className="text-sm text-gray-500 mt-1">
-          Monitor and manage workflow executions across your platform
+          Manage and configure PlatformNEX components and workflows
         </p>
       </div>
       
       <div className="mb-6 flex flex-col md:flex-row justify-between items-start gap-4">
-        <Tabs defaultValue="active" onValueChange={setActiveTab} className="w-full">
+        <Tabs defaultValue="enabled" onValueChange={setActiveTab} className="w-full">
           <TabsList>
-            <TabsTrigger value="all">All Flows</TabsTrigger>
-            <TabsTrigger value="active">Active</TabsTrigger>
-            <TabsTrigger value="completed">Completed</TabsTrigger>
-            <TabsTrigger value="paused">Paused</TabsTrigger>
-            <TabsTrigger value="failed">Failed</TabsTrigger>
+            <TabsTrigger value="all">All Configs</TabsTrigger>
+            <TabsTrigger value="enabled">Enabled</TabsTrigger>
+            <TabsTrigger value="disabled">Disabled</TabsTrigger>
+            <TabsTrigger value="draft">Drafts</TabsTrigger>
+            <TabsTrigger value="deprecated">Deprecated</TabsTrigger>
           </TabsList>
         </Tabs>
         
@@ -237,14 +236,14 @@ export default function FlowControlPage() {
           <DialogTrigger asChild>
             <Button className="whitespace-nowrap">
               <Plus className="h-4 w-4 mr-2" />
-              New Flow
+              New Configuration
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[600px]">
             <DialogHeader>
-              <DialogTitle>Create New Execution Flow</DialogTitle>
+              <DialogTitle>Create New Configuration</DialogTitle>
               <DialogDescription>
-                Define a new workflow for automated processes in your platform.
+                Define a new configuration for PlatformNEX components and workflows.
               </DialogDescription>
             </DialogHeader>
             
