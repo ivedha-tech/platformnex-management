@@ -93,10 +93,10 @@ export default function AuthPage() {
   };
   
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex flex-col md:flex-row">
       {/* Left column - Forms */}
       <div className="w-full md:w-1/2 p-6 md:p-12 flex items-center justify-center">
-        <div className="w-full max-w-md">
+        <div className="w-full max-w-md border border-gray-200 rounded-lg shadow-sm p-6 bg-white">
           <div className="text-center mb-8">
             <h1 className="text-2xl font-semibold text-gray-900">PlatformNEX Management</h1>
             <p className="text-gray-500 mt-2">Sign in to access the management portal</p>
@@ -373,6 +373,10 @@ export default function AuthPage() {
               </Form>
             </TabsContent>
           </Tabs>
+          
+          <div className="mt-6 text-center text-sm text-gray-500">
+            Need help? Contact IT Support
+          </div>
         </div>
       </div>
       
