@@ -25,7 +25,9 @@ import {
   Save, 
   Settings, 
   StopCircle, 
-  XCircle
+  XCircle,
+  Power,
+  RotateCcw
 } from "lucide-react";
 import { useState } from "react";
 
@@ -213,7 +215,7 @@ export default function FlowControlPage() {
     : flowConfigs.filter(config => config.status === activeTab);
   
   return (
-    <DashboardLayout title="Execution Flow Control">
+    <DashboardLayout title="PlatformNEX Configuration">
       <div className="mb-6">
         <h2 className="text-2xl font-semibold text-gray-900">PlatformNEX Configuration</h2>
         <p className="text-sm text-gray-500 mt-1">
@@ -426,7 +428,7 @@ export default function FlowControlPage() {
               </Button>
               <div className="space-x-2">
                 <Button variant="outline" className="flex items-center">
-                  <History className="h-4 w-4 mr-2" />
+                  <RotateCcw className="h-4 w-4 mr-2" />
                   Version History
                 </Button>
                 <Button variant="outline" className="flex items-center text-blue-600 border-blue-200 hover:bg-blue-50">
