@@ -116,7 +116,7 @@ export default function PluginUpdatePage() {
   });
 
   // Get unique domains from plugins
-  const domains = plugins ? [...new Set(plugins.map(plugin => plugin.domain))] : [];
+  const domains = plugins ? Array.from(new Set(plugins.map(plugin => plugin.domain))) : [];
   
   // Set first domain as active if none is selected and domains are available
   useEffect(() => {
@@ -140,7 +140,6 @@ export default function PluginUpdatePage() {
       toast({
         title: "Status updated",
         description: "Plugin status has been updated successfully",
-        variant: "success",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/plugins"] });
     },
@@ -167,7 +166,6 @@ export default function PluginUpdatePage() {
       toast({
         title: "Plugin created",
         description: "New plugin has been created successfully",
-        variant: "success",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/plugins"] });
     },

@@ -17,6 +17,7 @@ import {
   LogOut,
   Menu,
   X,
+  Package,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -177,6 +178,16 @@ export function Sidebar({ className }: SidebarProps) {
                   onClick={() => setIsOpen(false)}
                 >
                   Orchestrator Config
+                </SidebarLink>
+              </li>
+              <li>
+                <SidebarLink
+                  href="/plugin-update"
+                  icon={<Package />}
+                  currentPath={location}
+                  onClick={() => setIsOpen(false)}
+                >
+                  Plugin Updates
                 </SidebarLink>
               </li>
               {/* Flow Control has been merged into Golden Path & Templates */}
