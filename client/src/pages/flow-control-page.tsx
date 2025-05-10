@@ -250,11 +250,11 @@ export default function FlowControlPage() {
             <div className="space-y-4 py-4">
               <div className="grid grid-cols-1 gap-4">
                 <div className="space-y-2">
-                  <label htmlFor="name" className="text-sm font-medium">Flow Name</label>
+                  <label htmlFor="name" className="text-sm font-medium">Configuration Name</label>
                   <input
                     id="name"
                     className="w-full rounded-md border border-gray-300 p-2 text-sm"
-                    placeholder="e.g., Database Migration Flow"
+                    placeholder="e.g., API Gateway Configuration"
                   />
                 </div>
                 
@@ -263,29 +263,42 @@ export default function FlowControlPage() {
                   <textarea
                     id="description"
                     className="w-full rounded-md border border-gray-300 p-2 text-sm"
-                    placeholder="Describe the purpose and behavior of this flow"
+                    placeholder="Describe the purpose and settings of this configuration"
                     rows={3}
                   />
                 </div>
                 
                 <div className="space-y-2">
-                  <label htmlFor="type" className="text-sm font-medium">Flow Type</label>
+                  <label htmlFor="type" className="text-sm font-medium">Configuration Type</label>
                   <select
                     id="type"
                     className="w-full rounded-md border border-gray-300 p-2 text-sm"
                   >
                     <option value="">Select a type</option>
                     <option value="CI/CD">CI/CD</option>
-                    <option value="Deployment">Deployment</option>
-                    <option value="Migration">Migration</option>
+                    <option value="API">API</option>
+                    <option value="Database">Database</option>
                     <option value="Security">Security</option>
-                    <option value="Backup">Backup</option>
+                    <option value="Deployment">Deployment</option>
+                    <option value="Infrastructure">Infrastructure</option>
+                  </select>
+                </div>
+                
+                <div className="space-y-2">
+                  <label htmlFor="status" className="text-sm font-medium">Initial Status</label>
+                  <select
+                    id="status"
+                    className="w-full rounded-md border border-gray-300 p-2 text-sm"
+                  >
+                    <option value="draft">Draft</option>
+                    <option value="enabled">Enabled</option>
+                    <option value="disabled">Disabled</option>
                   </select>
                 </div>
               </div>
               
               <div className="space-y-2">
-                <h3 className="text-sm font-medium">Stages Configuration</h3>
+                <h3 className="text-sm font-medium">Component Settings</h3>
                 <div className="border rounded-md p-4">
                   <div className="space-y-4">
                     <div className="flex items-center justify-between border-b pb-2">
@@ -293,7 +306,7 @@ export default function FlowControlPage() {
                         <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 mr-2">
                           1
                         </div>
-                        <span>Code Checkout</span>
+                        <span>Authentication Service</span>
                       </div>
                       <div className="flex items-center space-x-2">
                         <Button variant="ghost" size="sm">
@@ -310,7 +323,7 @@ export default function FlowControlPage() {
                         <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 mr-2">
                           2
                         </div>
-                        <span>Build & Test</span>
+                        <span>Rate Limiting</span>
                       </div>
                       <div className="flex items-center space-x-2">
                         <Button variant="ghost" size="sm">
@@ -327,7 +340,7 @@ export default function FlowControlPage() {
                         <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 mr-2">
                           3
                         </div>
-                        <span>Deploy</span>
+                        <span>Routing Rules</span>
                       </div>
                       <div className="flex items-center space-x-2">
                         <Button variant="ghost" size="sm">
@@ -341,7 +354,7 @@ export default function FlowControlPage() {
                     
                     <Button variant="outline" className="w-full" size="sm">
                       <Plus className="h-4 w-4 mr-2" />
-                      Add Stage
+                      Add Component
                     </Button>
                   </div>
                 </div>
@@ -353,7 +366,7 @@ export default function FlowControlPage() {
                 Cancel
               </Button>
               <Button type="submit">
-                Create Flow
+                Create Configuration
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -361,22 +374,22 @@ export default function FlowControlPage() {
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        {filteredFlows.map((flow) => (
-          <FlowCard 
-            key={flow.id}
-            title={flow.title}
-            description={flow.description}
-            status={flow.status}
-            lastRun={flow.lastRun}
-            type={flow.type}
+        {filteredConfigs.map((config) => (
+          <FlowConfigCard 
+            key={config.id}
+            title={config.title}
+            description={config.description}
+            status={config.status}
+            lastUpdated={config.lastUpdated}
+            type={config.type}
           />
         ))}
       </div>
       
       <div className="mb-6">
-        <h3 className="text-xl font-semibold mb-2">Active Flow Execution</h3>
+        <h3 className="text-xl font-semibold mb-2">Selected Configuration</h3>
         <p className="text-sm text-gray-500">
-          Monitor and control the currently executing flow
+          View and manage configuration details and component settings
         </p>
       </div>
       
@@ -385,40 +398,40 @@ export default function FlowControlPage() {
           <CardHeader>
             <div className="flex justify-between items-center">
               <div>
-                <CardTitle>{selectedFlow.title}</CardTitle>
-                <CardDescription>{selectedFlow.description}</CardDescription>
+                <CardTitle>{selectedConfig.title}</CardTitle>
+                <CardDescription>{selectedConfig.description}</CardDescription>
               </div>
               <Badge className="bg-green-100 text-green-800 capitalize">
-                {selectedFlow.status}
+                {selectedConfig.status}
               </Badge>
             </div>
           </CardHeader>
           <CardContent>
             <div className="space-y-6 mb-4">
-              {selectedFlow.stages.map((stage, i) => (
-                <FlowStage 
+              {selectedConfig.stages.map((stage, i) => (
+                <FlowConfigStage 
                   key={i}
                   name={stage.name}
                   status={stage.status}
                   index={i}
-                  isLast={i === selectedFlow.stages.length - 1}
+                  isLast={i === selectedConfig.stages.length - 1}
                 />
               ))}
             </div>
             
             <div className="mt-8 flex justify-between">
               <Button variant="outline" className="flex items-center">
-                <StopCircle className="h-4 w-4 mr-2" />
-                Pause Execution
+                <Power className="h-4 w-4 mr-2" />
+                Toggle Status
               </Button>
               <div className="space-x-2">
-                <Button variant="outline" className="flex items-center" disabled>
-                  <ArrowDownUp className="h-4 w-4 mr-2" />
-                  Skip Stage
+                <Button variant="outline" className="flex items-center">
+                  <History className="h-4 w-4 mr-2" />
+                  Version History
                 </Button>
-                <Button variant="outline" className="flex items-center text-red-600 border-red-200 hover:bg-red-50">
-                  <XCircle className="h-4 w-4 mr-2" />
-                  Abort Flow
+                <Button variant="outline" className="flex items-center text-blue-600 border-blue-200 hover:bg-blue-50">
+                  <Save className="h-4 w-4 mr-2" />
+                  Save Changes
                 </Button>
               </div>
             </div>
@@ -428,28 +441,28 @@ export default function FlowControlPage() {
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Execution Details</CardTitle>
+              <CardTitle className="text-lg">Configuration Details</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-2">
                   <div className="text-sm text-gray-500">Status</div>
-                  <div className="text-sm font-medium">Active</div>
+                  <div className="text-sm font-medium">Enabled</div>
                   
-                  <div className="text-sm text-gray-500">Started</div>
+                  <div className="text-sm text-gray-500">Created</div>
+                  <div className="text-sm font-medium">May 1, 2025</div>
+                  
+                  <div className="text-sm text-gray-500">Last Modified</div>
                   <div className="text-sm font-medium">Today, 10:23 AM</div>
                   
-                  <div className="text-sm text-gray-500">Duration</div>
-                  <div className="text-sm font-medium">45m 12s</div>
+                  <div className="text-sm text-gray-500">Modified By</div>
+                  <div className="text-sm font-medium">Admin User</div>
                   
-                  <div className="text-sm text-gray-500">Initiated by</div>
-                  <div className="text-sm font-medium">CI System</div>
+                  <div className="text-sm text-gray-500">Version</div>
+                  <div className="text-sm font-medium">2.4</div>
                   
-                  <div className="text-sm text-gray-500">Current Stage</div>
-                  <div className="text-sm font-medium">Integration Tests</div>
-                  
-                  <div className="text-sm text-gray-500">Next Stage</div>
-                  <div className="text-sm font-medium">Security Scan</div>
+                  <div className="text-sm text-gray-500">Next Review</div>
+                  <div className="text-sm font-medium">Jun 15, 2025</div>
                 </div>
               </div>
             </CardContent>
@@ -457,29 +470,29 @@ export default function FlowControlPage() {
           
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Action History</CardTitle>
+              <CardTitle className="text-lg">Modification History</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="border-l-2 border-blue-500 pl-3 py-1">
-                  <div className="text-sm font-medium">Stage Started</div>
-                  <div className="text-xs text-gray-500">10:45 AM</div>
-                  <div className="text-sm mt-1">Integration Tests started</div>
+                  <div className="text-sm font-medium">Configuration Updated</div>
+                  <div className="text-xs text-gray-500">Today, 10:23 AM</div>
+                  <div className="text-sm mt-1">Integration Tests settings modified</div>
                 </div>
                 <div className="border-l-2 border-green-500 pl-3 py-1">
-                  <div className="text-sm font-medium">Stage Completed</div>
-                  <div className="text-xs text-gray-500">10:40 AM</div>
-                  <div className="text-sm mt-1">Unit Tests completed successfully</div>
+                  <div className="text-sm font-medium">Status Change</div>
+                  <div className="text-xs text-gray-500">Yesterday, 2:40 PM</div>
+                  <div className="text-sm mt-1">Configuration enabled</div>
                 </div>
                 <div className="border-l-2 border-blue-500 pl-3 py-1">
-                  <div className="text-sm font-medium">Stage Started</div>
-                  <div className="text-xs text-gray-500">10:35 AM</div>
-                  <div className="text-sm mt-1">Unit Tests started</div>
+                  <div className="text-sm font-medium">Stage Added</div>
+                  <div className="text-xs text-gray-500">May 8, 2025</div>
+                  <div className="text-sm mt-1">Added UI Tests stage</div>
                 </div>
-                <div className="border-l-2 border-green-500 pl-3 py-1">
-                  <div className="text-sm font-medium">Stage Completed</div>
-                  <div className="text-xs text-gray-500">10:30 AM</div>
-                  <div className="text-sm mt-1">Build completed successfully</div>
+                <div className="border-l-2 border-orange-500 pl-3 py-1">
+                  <div className="text-sm font-medium">Parameter Changed</div>
+                  <div className="text-xs text-gray-500">May 5, 2025</div>
+                  <div className="text-sm mt-1">Updated security scan parameters</div>
                 </div>
               </div>
             </CardContent>
