@@ -36,7 +36,7 @@ import { useForm } from "react-hook-form";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { format } from "date-fns";
-import { Edit, Plus, Search, Trash } from "lucide-react";
+import { Edit, Plus, Search, Trash, CheckCircle, Clock, Settings, Power, RotateCcw, Save } from "lucide-react";
 import { useState } from "react";
 
 // Form schema for creating a new template
@@ -266,9 +266,178 @@ export default function GoldenPathPage() {
                     </div>
                   </CardContent>
                   <div className="px-6 pb-4">
-                    <Button variant="outline" className="w-full">
-                      View Details
-                    </Button>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" className="w-full">
+                          View Details
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-[900px] w-[90vw]">
+                        <DialogHeader>
+                          <DialogTitle>{template.name}</DialogTitle>
+                          <DialogDescription>
+                            {template.description}
+                          </DialogDescription>
+                        </DialogHeader>
+                        
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+                          <Card className="lg:col-span-2">
+                            <CardHeader>
+                              <div className="flex justify-between items-center">
+                                <div>
+                                  <CardTitle>Configuration Details</CardTitle>
+                                  <CardDescription>Current configuration settings and components</CardDescription>
+                                </div>
+                                <Badge className="bg-green-100 text-green-800 capitalize">
+                                  enabled
+                                </Badge>
+                              </div>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="space-y-6 mb-4">
+                                {/* Configuration stages - we'll use similar stages for all templates for now */}
+                                <div className="flex items-center">
+                                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-green-500 text-white">
+                                    <CheckCircle className="h-5 w-5" />
+                                  </div>
+                                  <div className="ml-4 flex-1">
+                                    <p className="font-medium">Code Checkout</p>
+                                    <p className="text-sm text-gray-500 capitalize">configured</p>
+                                  </div>
+                                  <div className="flex-1 mx-4">
+                                    <div className="h-0.5 bg-gray-200 relative">
+                                      <div 
+                                        className="absolute inset-0 bg-green-500"
+                                        style={{ width: "100%" }}
+                                      ></div>
+                                    </div>
+                                  </div>
+                                </div>
+                                
+                                <div className="flex items-center">
+                                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-green-500 text-white">
+                                    <CheckCircle className="h-5 w-5" />
+                                  </div>
+                                  <div className="ml-4 flex-1">
+                                    <p className="font-medium">Build</p>
+                                    <p className="text-sm text-gray-500 capitalize">configured</p>
+                                  </div>
+                                  <div className="flex-1 mx-4">
+                                    <div className="h-0.5 bg-gray-200 relative">
+                                      <div 
+                                        className="absolute inset-0 bg-green-500"
+                                        style={{ width: "100%" }}
+                                      ></div>
+                                    </div>
+                                  </div>
+                                </div>
+                                
+                                <div className="flex items-center">
+                                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-500 text-white">
+                                    <Settings className="h-5 w-5" />
+                                  </div>
+                                  <div className="ml-4 flex-1">
+                                    <p className="font-medium">Unit Tests</p>
+                                    <p className="text-sm text-gray-500 capitalize">active</p>
+                                  </div>
+                                  <div className="flex-1 mx-4">
+                                    <div className="h-0.5 bg-gray-200 relative">
+                                      <div 
+                                        className="absolute inset-0 bg-gray-200"
+                                        style={{ width: "0%" }}
+                                      ></div>
+                                    </div>
+                                  </div>
+                                </div>
+                                
+                                <div className="flex items-center">
+                                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-300 text-gray-700">
+                                    <Clock className="h-5 w-5" />
+                                  </div>
+                                  <div className="ml-4 flex-1">
+                                    <p className="font-medium">Integration Tests</p>
+                                    <p className="text-sm text-gray-500 capitalize">pending</p>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              <div className="mt-8 flex justify-between">
+                                <Button variant="outline" className="flex items-center">
+                                  <Power className="h-4 w-4 mr-2" />
+                                  Toggle Status
+                                </Button>
+                                <div className="space-x-2">
+                                  <Button variant="outline" className="flex items-center">
+                                    <RotateCcw className="h-4 w-4 mr-2" />
+                                    Version History
+                                  </Button>
+                                  <Button variant="outline" className="flex items-center text-blue-600 border-blue-200 hover:bg-blue-50">
+                                    <Save className="h-4 w-4 mr-2" />
+                                    Save Changes
+                                  </Button>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                          
+                          <div className="space-y-6">
+                            <Card>
+                              <CardHeader>
+                                <CardTitle className="text-lg">Template Details</CardTitle>
+                              </CardHeader>
+                              <CardContent>
+                                <div className="space-y-4">
+                                  <div className="grid grid-cols-2 gap-2">
+                                    <div className="text-sm text-gray-500">Status</div>
+                                    <div className="text-sm font-medium">Enabled</div>
+                                    
+                                    <div className="text-sm text-gray-500">Created</div>
+                                    <div className="text-sm font-medium">{format(new Date(template.createdAt), "MMM d, yyyy")}</div>
+                                    
+                                    <div className="text-sm text-gray-500">Last Modified</div>
+                                    <div className="text-sm font-medium">{format(new Date(template.updatedAt), "MMM d, yyyy")}</div>
+                                    
+                                    <div className="text-sm text-gray-500">Category</div>
+                                    <div className="text-sm font-medium">{template.category}</div>
+                                    
+                                    <div className="text-sm text-gray-500">Version</div>
+                                    <div className="text-sm font-medium">1.2</div>
+                                    
+                                    <div className="text-sm text-gray-500">Next Review</div>
+                                    <div className="text-sm font-medium">Jun 15, 2025</div>
+                                  </div>
+                                </div>
+                              </CardContent>
+                            </Card>
+                            
+                            <Card>
+                              <CardHeader>
+                                <CardTitle className="text-lg">Modification History</CardTitle>
+                              </CardHeader>
+                              <CardContent>
+                                <div className="space-y-4">
+                                  <div className="border-l-2 border-blue-500 pl-3 py-1">
+                                    <div className="text-sm font-medium">Template Updated</div>
+                                    <div className="text-xs text-gray-500">Today, 10:23 AM</div>
+                                    <div className="text-sm mt-1">Integration Tests settings modified</div>
+                                  </div>
+                                  <div className="border-l-2 border-green-500 pl-3 py-1">
+                                    <div className="text-sm font-medium">Status Change</div>
+                                    <div className="text-xs text-gray-500">Yesterday, 2:40 PM</div>
+                                    <div className="text-sm mt-1">Template enabled</div>
+                                  </div>
+                                  <div className="border-l-2 border-blue-500 pl-3 py-1">
+                                    <div className="text-sm font-medium">Stage Added</div>
+                                    <div className="text-xs text-gray-500">May 8, 2025</div>
+                                    <div className="text-sm mt-1">Added Integration Tests stage</div>
+                                  </div>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          </div>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                   </div>
                 </Card>
               ))
