@@ -93,10 +93,10 @@ export default function AuthPage() {
   };
   
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
-      {/* Left column - Forms */}
-      <div className="w-full md:w-1/2 p-6 md:p-12 flex items-center justify-center">
-        <div className="w-full max-w-md">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex flex-col items-center justify-center">
+      {/* Login Form */}
+      <div className="w-full max-w-md p-6 flex items-center justify-center">
+        <div className="w-full border border-gray-200 rounded-lg shadow-sm p-6 bg-white">
           <div className="text-center mb-8">
             <h1 className="text-2xl font-semibold text-gray-900">PlatformNEX Management</h1>
             <p className="text-gray-500 mt-2">Sign in to access the management portal</p>
@@ -211,7 +211,7 @@ export default function AuthPage() {
                         <FormItem>
                           <FormLabel>First Name</FormLabel>
                           <FormControl>
-                            <Input placeholder="John" {...field} />
+                            <Input placeholder="John" {...field} value={field.value || ''} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -225,7 +225,7 @@ export default function AuthPage() {
                         <FormItem>
                           <FormLabel>Last Name</FormLabel>
                           <FormControl>
-                            <Input placeholder="Doe" {...field} />
+                            <Input placeholder="Doe" {...field} value={field.value || ''} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -240,7 +240,7 @@ export default function AuthPage() {
                       <FormItem>
                         <FormLabel>Username</FormLabel>
                         <FormControl>
-                          <Input placeholder="johndoe" {...field} />
+                          <Input placeholder="johndoe" {...field} value={field.value || ''} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -254,7 +254,7 @@ export default function AuthPage() {
                       <FormItem>
                         <FormLabel>Email</FormLabel>
                         <FormControl>
-                          <Input type="email" placeholder="john.doe@example.com" {...field} />
+                          <Input type="email" placeholder="john.doe@example.com" {...field} value={field.value || ''} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -373,46 +373,9 @@ export default function AuthPage() {
               </Form>
             </TabsContent>
           </Tabs>
-        </div>
-      </div>
-      
-      {/* Right column - Hero */}
-      <div className="hidden md:flex md:w-1/2 bg-primary-600 text-white p-12 flex-col justify-center">
-        <div className="max-w-md mx-auto">
-          <h2 className="text-3xl font-bold mb-6">PlatformNEX Management Portal</h2>
-          <p className="text-xl mb-8">
-            The comprehensive platform for managing and monitoring your developer experience platform.
-          </p>
           
-          <ul className="space-y-4 mb-8">
-            <li className="flex items-start">
-              <svg className="h-6 w-6 mr-2 text-primary-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-              <span>Monitor developer experience metrics</span>
-            </li>
-            <li className="flex items-start">
-              <svg className="h-6 w-6 mr-2 text-primary-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-              <span>Manage golden path templates</span>
-            </li>
-            <li className="flex items-start">
-              <svg className="h-6 w-6 mr-2 text-primary-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-              <span>Configure orchestration services</span>
-            </li>
-            <li className="flex items-start">
-              <svg className="h-6 w-6 mr-2 text-primary-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-              <span>Administer platform security and users</span>
-            </li>
-          </ul>
-          
-          <div className="text-primary-100 text-sm">
-            © 2023 PlatformNEX. All rights reserved.
+          <div className="mt-6 text-center text-sm text-gray-500">
+            Need help? Contact IT Support
           </div>
         </div>
       </div>

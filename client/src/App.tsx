@@ -11,10 +11,11 @@ import OperationsMetricsPage from "@/pages/operations-metrics-page";
 import ActivityHistoryPage from "@/pages/activity-history-page";
 import GoldenPathPage from "@/pages/golden-path-page";
 import OrchestratorConfigPage from "@/pages/orchestrator-config-page";
-import FlowControlPage from "@/pages/flow-control-page";
+// Flow Control Page has been merged into Golden Path page
 import UserManagementPage from "@/pages/user-management-page";
 import SecurityPoliciesPage from "@/pages/security-policies-page";
 import AuditLogsPage from "@/pages/audit-logs-page";
+import PluginUpdatePage from "@/pages/plugin-update-page";
 import { AuthProvider } from "@/hooks/use-auth";
 
 function Router() {
@@ -26,7 +27,8 @@ function Router() {
       <ProtectedRoute path="/activity-history" component={ActivityHistoryPage} />
       <ProtectedRoute path="/golden-path" component={GoldenPathPage} />
       <ProtectedRoute path="/orchestrator-config" component={OrchestratorConfigPage} />
-      <ProtectedRoute path="/flow-control" component={FlowControlPage} />
+      <ProtectedRoute path="/plugin-update" component={PluginUpdatePage} />
+      {/* Flow Control has been merged into Golden Path page */}
       <ProtectedRoute path="/user-management" component={UserManagementPage} />
       <ProtectedRoute path="/security-policies" component={SecurityPoliciesPage} />
       <ProtectedRoute path="/audit-logs" component={AuditLogsPage} />

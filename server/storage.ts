@@ -1,11 +1,12 @@
-import { users, developerMetrics, feedback, activityLog, goldenPathTemplate } from "@shared/schema";
+import { users, developerMetrics, feedback, activityLog, goldenPathTemplate, pluginUpdate } from "@shared/schema";
 import type { 
   User, 
   InsertUser, 
   DeveloperMetric, 
   Feedback, 
   ActivityLog, 
-  GoldenPathTemplate 
+  GoldenPathTemplate,
+  PluginUpdate
 } from "@shared/schema";
 import createMemoryStore from "memorystore";
 import session from "express-session";
@@ -32,8 +33,14 @@ export interface IStorage {
   getGoldenPathTemplates(): Promise<GoldenPathTemplate[]>;
   createGoldenPathTemplate(template: Omit<GoldenPathTemplate, 'id'>): Promise<GoldenPathTemplate>;
   
+  // Plugin updates
+  getPluginUpdates(): Promise<PluginUpdate[]>;
+  getPluginUpdatesByDomain(domain: string): Promise<PluginUpdate[]>;
+  createPluginUpdate(update: Omit<PluginUpdate, 'id'>): Promise<PluginUpdate>;
+  updatePluginStatus(id: number, status: string): Promise<PluginUpdate | undefined>;
+  
   // Session store
-  sessionStore: session.SessionStore;
+  sessionStore: any;
 }
 
 export class MemStorage implements IStorage {
@@ -42,14 +49,16 @@ export class MemStorage implements IStorage {
   private feedbackItems: Map<number, Feedback>;
   private activityLogs: Map<number, ActivityLog>;
   private goldenPathTemplates: Map<number, GoldenPathTemplate>;
+  private pluginUpdates: Map<number, PluginUpdate>;
   
-  sessionStore: session.SessionStore;
+  sessionStore: any;
   
   userId: number = 1;
   metricId: number = 1;
   feedbackId: number = 1;
   logId: number = 1;
   templateId: number = 1;
+  pluginId: number = 1;
 
   constructor() {
     this.users = new Map();
@@ -57,6 +66,7 @@ export class MemStorage implements IStorage {
     this.feedbackItems = new Map();
     this.activityLogs = new Map();
     this.goldenPathTemplates = new Map();
+    this.pluginUpdates = new Map();
     
     const MemoryStore = createMemoryStore(session);
     this.sessionStore = new MemoryStore({
@@ -85,6 +95,9 @@ export class MemStorage implements IStorage {
     
     // Seed golden path templates
     this.seedGoldenPathTemplates();
+    
+    // Seed plugin updates
+    this.seedPluginUpdates();
   }
 
   async getUser(id: number): Promise<User | undefined> {
@@ -311,6 +324,71 @@ export class MemStorage implements IStorage {
         createdAt: new Date(Date.now() - 15 * 86400000), // 15 days ago
         updatedAt: new Date(Date.now() - 15 * 86400000), // 15 days ago
         isActive: true
+      },
+      {
+        name: "Microservice Template",
+        description: "A complete template for building scalable microservices with service discovery and tracing",
+        category: "Application",
+        content: JSON.stringify({
+          components: ["api", "service", "repository", "messaging"],
+          configuration: ["circuit-breaker", "timeout", "retry", "metrics"],
+        }),
+        createdBy: 1,
+        createdAt: new Date(Date.now() - 12 * 86400000), // 12 days ago
+        updatedAt: new Date(Date.now() - 3 * 86400000), // 3 days ago
+        isActive: true
+      },
+      {
+        name: "Data Pipeline",
+        description: "An end-to-end data pipeline with ingestion, transformation, validation, and storage",
+        category: "Data",
+        content: JSON.stringify({
+          stages: ["ingest", "clean", "transform", "validate", "load"],
+          tools: ["Apache Spark", "Airflow", "Kafka"],
+        }),
+        createdBy: 1,
+        createdAt: new Date(Date.now() - 10 * 86400000), // 10 days ago
+        updatedAt: new Date(Date.now() - 1 * 86400000), // 1 day ago
+        isActive: true
+      },
+      {
+        name: "Database Service",
+        description: "Template for database service with connection pooling, migrations, and schema management",
+        category: "Data",
+        content: JSON.stringify({
+          features: ["connection-pool", "migrations", "schema-validation", "query-layer"],
+          databases: ["PostgreSQL", "MySQL", "MongoDB"],
+        }),
+        createdBy: 1,
+        createdAt: new Date(Date.now() - 8 * 86400000), // 8 days ago
+        updatedAt: new Date(Date.now() - 1 * 86400000), // 1 day ago
+        isActive: true
+      },
+      {
+        name: "Machine Learning Model",
+        description: "Template for deploying ML models with monitoring, versioning, and A/B testing",
+        category: "AI/ML",
+        content: JSON.stringify({
+          components: ["model-service", "feature-store", "experiment-tracker", "monitoring"],
+          ml_frameworks: ["TensorFlow", "PyTorch", "scikit-learn"],
+        }),
+        createdBy: 1,
+        createdAt: new Date(Date.now() - 7 * 86400000), // 7 days ago
+        updatedAt: new Date(Date.now() - 1 * 86400000), // 1 day ago
+        isActive: true
+      },
+      {
+        name: "Web Application",
+        description: "Template for modern web applications with SSR, authentication, and state management",
+        category: "Application",
+        content: JSON.stringify({
+          frontend: ["components", "state", "routing", "api-client"],
+          backend: ["api", "auth", "database", "caching"],
+        }),
+        createdBy: 1,
+        createdAt: new Date(Date.now() - 5 * 86400000), // 5 days ago
+        updatedAt: new Date(Date.now() - 1 * 86400000), // 1 day ago
+        isActive: true
       }
     ];
     
@@ -320,6 +398,193 @@ export class MemStorage implements IStorage {
         ...template
       };
       this.goldenPathTemplates.set(goldenPath.id, goldenPath);
+    });
+  }
+  async getPluginUpdates(): Promise<PluginUpdate[]> {
+    return Array.from(this.pluginUpdates.values());
+  }
+  
+  async getPluginUpdatesByDomain(domain: string): Promise<PluginUpdate[]> {
+    return Array.from(this.pluginUpdates.values()).filter(
+      (update) => update.domain === domain
+    );
+  }
+  
+  async createPluginUpdate(update: Omit<PluginUpdate, 'id'>): Promise<PluginUpdate> {
+    const id = this.pluginId++;
+    const newUpdate: PluginUpdate = { ...update, id };
+    this.pluginUpdates.set(id, newUpdate);
+    return newUpdate;
+  }
+  
+  async updatePluginStatus(id: number, status: string): Promise<PluginUpdate | undefined> {
+    const update = this.pluginUpdates.get(id);
+    if (!update) return undefined;
+    
+    const updatedPlugin: PluginUpdate = {
+      ...update,
+      status,
+      updatedAt: new Date()
+    };
+    
+    this.pluginUpdates.set(id, updatedPlugin);
+    return updatedPlugin;
+  }
+  
+  private seedPluginUpdates() {
+    const today = new Date();
+    const plugins = [
+      // Build & Deploy domain
+      {
+        domain: "Build & Deploy",
+        name: "CI Pipeline SDK",
+        version: "2.3.4",
+        releaseDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() - 3),
+        status: "stable",
+        description: "SDK for creating and managing CI pipelines",
+        changeLog: "- Added support for parallel test execution\n- Improved caching mechanism\n- Fixed issue with artifact persistence",
+        updatedBy: 1,
+        updatedAt: new Date(today.getFullYear(), today.getMonth(), today.getDate() - 3)
+      },
+      {
+        domain: "Build & Deploy",
+        name: "Deployment Controller",
+        version: "1.8.0",
+        releaseDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() - 10),
+        status: "stable",
+        description: "Controls application deployments across environments",
+        changeLog: "- Added canary deployment strategy\n- Enhanced rollback capabilities\n- Improved metrics collection during deployment",
+        updatedBy: 1,
+        updatedAt: new Date(today.getFullYear(), today.getMonth(), today.getDate() - 10)
+      },
+      
+      // Application Reliability domain
+      {
+        domain: "Application Reliability",
+        name: "Service Mesh Connector",
+        version: "3.1.2",
+        releaseDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() - 5),
+        status: "stable",
+        description: "Connects applications with service mesh technologies",
+        changeLog: "- Added support for Istio 1.15\n- Enhanced traffic splitting capabilities\n- Improved latency metrics collection",
+        updatedBy: 1,
+        updatedAt: new Date(today.getFullYear(), today.getMonth(), today.getDate() - 5)
+      },
+      {
+        domain: "Application Reliability",
+        name: "Fault Injection SDK",
+        version: "0.9.5",
+        releaseDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() - 2),
+        status: "beta",
+        description: "Tools for chaos engineering and fault injection",
+        changeLog: "- Added network partition simulation\n- Enhanced latency injection capabilities\n- Beta support for memory leak simulation",
+        updatedBy: 1,
+        updatedAt: new Date(today.getFullYear(), today.getMonth(), today.getDate() - 2)
+      },
+      
+      // TestOps domain
+      {
+        domain: "TestOps",
+        name: "Test Orchestrator",
+        version: "2.0.0",
+        releaseDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() - 15),
+        status: "stable",
+        description: "End-to-end test orchestration framework",
+        changeLog: "- Major version update with API changes\n- Added parallel test execution\n- Enhanced reporting capabilities\n- Support for test data management",
+        updatedBy: 1,
+        updatedAt: new Date(today.getFullYear(), today.getMonth(), today.getDate() - 15)
+      },
+      {
+        domain: "TestOps",
+        name: "API Mocking Framework",
+        version: "1.4.3",
+        releaseDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() - 8),
+        status: "stable",
+        description: "Mock API responses for testing",
+        changeLog: "- Added support for GraphQL mocking\n- Enhanced request matching logic\n- Fixed timing issues with async responses",
+        updatedBy: 1,
+        updatedAt: new Date(today.getFullYear(), today.getMonth(), today.getDate() - 8)
+      },
+      
+      // Cloud Operations domain
+      {
+        domain: "Cloud Operations",
+        name: "Infrastructure Analyzer",
+        version: "3.2.1",
+        releaseDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7),
+        status: "stable",
+        description: "Analyzes and optimizes cloud infrastructure",
+        changeLog: "- Added support for AWS Lambda cost analysis\n- Enhanced resource utilization reports\n- Improved recommendation engine",
+        updatedBy: 1,
+        updatedAt: new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7)
+      },
+      {
+        domain: "Cloud Operations",
+        name: "Multi-Cloud Manager",
+        version: "1.0.0",
+        releaseDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1),
+        status: "beta",
+        description: "Manage resources across multiple cloud providers",
+        changeLog: "- Initial release with support for AWS, GCP, and Azure\n- Basic resource provisioning\n- Cross-cloud monitoring",
+        updatedBy: 1,
+        updatedAt: new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1)
+      },
+      
+      // FinOps domain
+      {
+        domain: "FinOps",
+        name: "Cost Optimization Engine",
+        version: "2.4.5",
+        releaseDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() - 12),
+        status: "stable",
+        description: "Analyzes and optimizes cloud spending",
+        changeLog: "- Added anomaly detection for cost spikes\n- Enhanced resource right-sizing recommendations\n- Improved forecast accuracy",
+        updatedBy: 1,
+        updatedAt: new Date(today.getFullYear(), today.getMonth(), today.getDate() - 12)
+      },
+      {
+        domain: "FinOps",
+        name: "Budget Manager",
+        version: "1.6.2",
+        releaseDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() - 9),
+        status: "stable",
+        description: "Manage and enforce cloud budgets",
+        changeLog: "- Added support for project-based budgets\n- Enhanced alerting mechanisms\n- Improved forecast visualization",
+        updatedBy: 1,
+        updatedAt: new Date(today.getFullYear(), today.getMonth(), today.getDate() - 9)
+      },
+      
+      // Security domain
+      {
+        domain: "Security",
+        name: "Vulnerability Scanner",
+        version: "4.1.0",
+        releaseDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() - 6),
+        status: "stable",
+        description: "Scans code and infrastructure for vulnerabilities",
+        changeLog: "- Added support for container image scanning\n- Enhanced reporting of OWASP Top 10 vulnerabilities\n- Improved integration with CI/CD pipelines",
+        updatedBy: 1,
+        updatedAt: new Date(today.getFullYear(), today.getMonth(), today.getDate() - 6)
+      },
+      {
+        domain: "Security",
+        name: "IAM Policy Manager",
+        version: "2.2.3",
+        releaseDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() - 4),
+        status: "stable",
+        description: "Manages identity and access policies",
+        changeLog: "- Added policy drift detection\n- Enhanced multi-cloud IAM support\n- Improved integration with external identity providers",
+        updatedBy: 1,
+        updatedAt: new Date(today.getFullYear(), today.getMonth(), today.getDate() - 4)
+      }
+    ];
+    
+    plugins.forEach(plugin => {
+      const pluginUpdate: PluginUpdate = {
+        id: this.pluginId++,
+        ...plugin
+      };
+      this.pluginUpdates.set(pluginUpdate.id, pluginUpdate);
     });
   }
 }
