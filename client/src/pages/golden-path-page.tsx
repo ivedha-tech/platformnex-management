@@ -37,7 +37,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { format } from "date-fns";
 import { Edit, Plus, Search, Trash, CheckCircle, Clock, Settings, Power, RotateCcw, Save, ChevronDown, ChevronUp, FileText } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 
 const BACKSTAGE_API_URL = "https://platformnex-backend-pyzx2jrmda-uc.a.run.app";
@@ -160,14 +160,13 @@ export default function GoldenPathPage() {
               <span>New Template</span>
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[600px]">
+          <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto p-6">
             <DialogHeader>
               <DialogTitle>Create New Template</DialogTitle>
               <DialogDescription>
                 Define a new golden path template for your developers to use.
               </DialogDescription>
             </DialogHeader>
-            
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <FormField
@@ -233,26 +232,7 @@ export default function GoldenPathPage() {
                   )}
                 />
                 
-                <FormField
-                  control={form.control}
-                  name="content"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Template Content (JSON)</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder="Enter template configuration..." 
-                          className="font-mono h-32" 
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Define your template structure in JSON format.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <AddParametersStepsTabs form={form} />
                 
                 <DialogFooter>
                   <Button type="submit" disabled={createTemplateMutation.isPending}>
@@ -451,9 +431,153 @@ function EditTemplateDialog({ template }: { template: any }) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState(template.metadata.title || "");
   const [description, setDescription] = useState(template.metadata.description || "");
-  const [parameters, setParameters] = useState(JSON.stringify(template.spec.parameters, null, 2));
-  const [steps, setSteps] = useState(JSON.stringify(template.spec.steps, null, 2));
+
+  // UI/JSON mode toggles
+  const [paramMode, setParamMode] = useState<'ui' | 'json'>('ui');
+  const [stepMode, setStepMode] = useState<'ui' | 'json'>('ui');
+
+  // Interactive parameters state
+  const [parameters, setParameters] = useState<any[]>(
+    Array.isArray(template.spec.parameters) ? template.spec.parameters.map((p: any) => ({
+      ...p,
+      required: Array.isArray(p.required) ? p.required.join(", ") : "",
+      properties: p.properties ? Object.entries(p.properties).map(([k, v]) => ({ key: k, value: v })) : [],
+    })) : []
+  );
+  const [parametersJson, setParametersJson] = useState(
+    JSON.stringify(template.spec.parameters, null, 2)
+  );
+
+  // Interactive steps state
+  const [steps, setSteps] = useState<any[]>(
+    Array.isArray(template.spec.steps) ? template.spec.steps.map((s: any) => ({
+      ...s,
+      input: s.input ? Object.entries(s.input).map(([k, v]) => ({ key: k, value: v })) : [],
+    })) : []
+  );
+  const [stepsJson, setStepsJson] = useState(
+    JSON.stringify(template.spec.steps, null, 2)
+  );
+
   const [saving, setSaving] = useState(false);
+
+  // Sync UI <-> JSON for parameters
+  useEffect(() => {
+    if (paramMode === 'ui') {
+      setParametersJson(JSON.stringify(
+        parameters.map(p => ({
+          ...p,
+          required: p.required ? p.required.split(',').map((s: string) => s.trim()).filter(Boolean) : [],
+          properties: p.properties.reduce((acc: any, cur: any) => {
+            if (cur.key) acc[cur.key] = cur.value;
+            return acc;
+          }, {})
+        })),
+        null, 2
+      ));
+    }
+    // eslint-disable-next-line
+  }, [parameters, paramMode]);
+  useEffect(() => {
+    if (paramMode === 'json') {
+      try {
+        const arr = JSON.parse(parametersJson);
+        setParameters(Array.isArray(arr) ? arr.map((p: any) => ({
+          ...p,
+          required: Array.isArray(p.required) ? p.required.join(", ") : "",
+          properties: p.properties ? Object.entries(p.properties).map(([k, v]) => ({ key: k, value: v })) : [],
+        })) : []);
+      } catch {}
+    }
+    // eslint-disable-next-line
+  }, [parametersJson, paramMode]);
+
+  // Sync UI <-> JSON for steps
+  useEffect(() => {
+    if (stepMode === 'ui') {
+      setStepsJson(JSON.stringify(
+        steps.map(s => ({
+          ...s,
+          input: s.input.reduce((acc: any, cur: any) => {
+            if (cur.key) acc[cur.key] = cur.value;
+            return acc;
+          }, {})
+        })),
+        null, 2
+      ));
+    }
+    // eslint-disable-next-line
+  }, [steps, stepMode]);
+  useEffect(() => {
+    if (stepMode === 'json') {
+      try {
+        const arr = JSON.parse(stepsJson);
+        setSteps(Array.isArray(arr) ? arr.map((s: any) => ({
+          ...s,
+          input: s.input ? Object.entries(s.input).map(([k, v]) => ({ key: k, value: v })) : [],
+        })) : []);
+      } catch {}
+    }
+    // eslint-disable-next-line
+  }, [stepsJson, stepMode]);
+
+  // Parameter handlers
+  const handleParamChange = (idx: number, field: string, value: any) => {
+    setParameters(params => params.map((p, i) => i === idx ? { ...p, [field]: value } : p));
+  };
+  const handleParamPropertyChange = (pIdx: number, propIdx: number, field: string, value: any) => {
+    setParameters(params => params.map((p, i) => i === pIdx ? {
+      ...p,
+      properties: p.properties.map((prop: any, j: number) => j === propIdx ? { ...prop, [field]: value } : prop)
+    } : p));
+  };
+  const addParamProperty = (pIdx: number) => {
+    setParameters(params => params.map((p, i) => i === pIdx ? {
+      ...p,
+      properties: [...p.properties, { key: "", value: "" }]
+    } : p));
+  };
+  const removeParamProperty = (pIdx: number, propIdx: number) => {
+    setParameters(params => params.map((p, i) => i === pIdx ? {
+      ...p,
+      properties: p.properties.filter((_: any, j: number) => j !== propIdx)
+    } : p));
+  };
+  const addParameter = () => {
+    setParameters(params => [...params, { title: "", required: "", properties: [] }]);
+  };
+  const removeParameter = (idx: number) => {
+    setParameters(params => params.filter((_, i) => i !== idx));
+  };
+
+  // Step handlers
+  const handleStepChange = (idx: number, field: string, value: any) => {
+    setSteps(steps => steps.map((s, i) => i === idx ? { ...s, [field]: value } : s));
+  };
+  const handleStepInputChange = (sIdx: number, inputIdx: number, field: string, value: any) => {
+    setSteps(steps => steps.map((s, i) => i === sIdx ? {
+      ...s,
+      input: s.input.map((inp: any, j: number) => j === inputIdx ? { ...inp, [field]: value } : inp)
+    } : s));
+  };
+  const addStepInput = (sIdx: number) => {
+    setSteps(steps => steps.map((s, i) => i === sIdx ? {
+      ...s,
+      input: [...(s.input || []), { key: "", value: "" }]
+    } : s));
+  };
+  const removeStepInput = (sIdx: number, inputIdx: number) => {
+    setSteps(steps => steps.map((s, i) => i === sIdx ? {
+      ...s,
+      input: s.input.filter((_: any, j: number) => j !== inputIdx)
+    } : s));
+  };
+  const addStep = () => {
+    setSteps(steps => [...steps, { name: "", action: "", id: "", input: [] }]);
+  };
+  const removeStep = (idx: number) => {
+    setSteps(steps => steps.filter((_, i) => i !== idx));
+  };
 
   const handleSave = () => {
     setSaving(true);
@@ -471,7 +595,7 @@ function EditTemplateDialog({ template }: { template: any }) {
           <Edit className="h-4 w-4" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-[600px] w-full">
+      <DialogContent className="max-w-2xl w-full max-h-[80vh] overflow-y-auto p-6 sm:p-8">
         <DialogHeader>
           <DialogTitle>Edit Template</DialogTitle>
           <DialogDescription>
@@ -487,13 +611,113 @@ function EditTemplateDialog({ template }: { template: any }) {
             <label className="block text-sm font-medium mb-1">Description</label>
             <Textarea value={description} onChange={e => setDescription(e.target.value)} />
           </div>
+          {/* Parameters interactive form */}
           <div>
-            <label className="block text-sm font-medium mb-1">Parameters (JSON)</label>
-            <Textarea className="font-mono h-24" value={parameters} onChange={e => setParameters(e.target.value)} />
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-medium">Parameters</label>
+            </div>
+            <Tabs value={paramMode} onValueChange={v => setParamMode(v as 'ui' | 'json') } className="w-full">
+              <TabsList className="mb-2">
+                <TabsTrigger value="ui">Configure via UI</TabsTrigger>
+                <TabsTrigger value="json">Paste/Edit JSON</TabsTrigger>
+              </TabsList>
+              <TabsContent value="ui">
+                <div className="mb-2 text-right">
+                  <Button size="sm" variant="outline" onClick={addParameter}>Add Parameter</Button>
+                </div>
+                <div className="space-y-4">
+                  {parameters.map((param, pIdx) => (
+                    <div key={pIdx} className="border rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="block text-xs font-medium mb-1">Title</label>
+                        <Button size="icon" variant="ghost" className="text-red-500" onClick={() => removeParameter(pIdx)}><Trash className="h-4 w-4" /></Button>
+                      </div>
+                      <div className="mb-2">
+                        <Input value={param.title} onChange={e => handleParamChange(pIdx, "title", e.target.value)} />
+                      </div>
+                      <div className="mb-2">
+                        <label className="block text-xs font-medium mb-1">Required (comma separated)</label>
+                        <Input value={param.required} onChange={e => handleParamChange(pIdx, "required", e.target.value)} />
+                      </div>
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="block text-xs font-medium">Properties</label>
+                          <Button size="sm" variant="outline" onClick={() => addParamProperty(pIdx)}>Add Property</Button>
+                        </div>
+                        <div className="space-y-2">
+                          {param.properties.map((prop: any, propIdx: number) => (
+                            <div key={propIdx} className="flex gap-2 items-center">
+                              <Input className="w-1/3" placeholder="Key" value={prop.key} onChange={e => handleParamPropertyChange(pIdx, propIdx, "key", e.target.value)} />
+                              <Input className="w-2/3" placeholder="Value" value={prop.value} onChange={e => handleParamPropertyChange(pIdx, propIdx, "value", e.target.value)} />
+                              <Button size="icon" variant="ghost" className="text-red-500" onClick={() => removeParamProperty(pIdx, propIdx)}><Trash className="h-4 w-4" /></Button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </TabsContent>
+              <TabsContent value="json">
+                <Textarea className="font-mono h-40" value={parametersJson} onChange={e => setParametersJson(e.target.value)} />
+              </TabsContent>
+            </Tabs>
           </div>
+          {/* Steps interactive form */}
           <div>
-            <label className="block text-sm font-medium mb-1">Steps (JSON)</label>
-            <Textarea className="font-mono h-24" value={steps} onChange={e => setSteps(e.target.value)} />
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-medium">Steps</label>
+            </div>
+            <Tabs value={stepMode} onValueChange={v => setStepMode(v as 'ui' | 'json') } className="w-full">
+              <TabsList className="mb-2">
+                <TabsTrigger value="ui">Configure via UI</TabsTrigger>
+                <TabsTrigger value="json">Paste/Edit JSON</TabsTrigger>
+              </TabsList>
+              <TabsContent value="ui">
+                <div className="mb-2 text-right">
+                  <Button size="sm" variant="outline" onClick={addStep}>Add Step</Button>
+                </div>
+                <div className="space-y-4">
+                  {steps.map((step, sIdx) => (
+                    <div key={sIdx} className="border rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="block text-xs font-medium mb-1">Name</label>
+                        <Button size="icon" variant="ghost" className="text-red-500" onClick={() => removeStep(sIdx)}><Trash className="h-4 w-4" /></Button>
+                      </div>
+                      <div className="mb-2">
+                        <Input value={step.name} onChange={e => handleStepChange(sIdx, "name", e.target.value)} />
+                      </div>
+                      <div className="mb-2">
+                        <label className="block text-xs font-medium mb-1">Action</label>
+                        <Input value={step.action} onChange={e => handleStepChange(sIdx, "action", e.target.value)} />
+                      </div>
+                      <div className="mb-2">
+                        <label className="block text-xs font-medium mb-1">ID</label>
+                        <Input value={step.id} onChange={e => handleStepChange(sIdx, "id", e.target.value)} />
+                      </div>
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="block text-xs font-medium">Input</label>
+                          <Button size="sm" variant="outline" onClick={() => addStepInput(sIdx)}>Add Input</Button>
+                        </div>
+                        <div className="space-y-2">
+                          {Array.isArray(step.input) && step.input.map((inp: any, inpIdx: number) => (
+                            <div key={inpIdx} className="flex gap-2 items-center">
+                              <Input className="w-1/3" placeholder="Key" value={inp.key} onChange={e => handleStepInputChange(sIdx, inpIdx, "key", e.target.value)} />
+                              <Input className="w-2/3" placeholder="Value" value={inp.value} onChange={e => handleStepInputChange(sIdx, inpIdx, "value", e.target.value)} />
+                              <Button size="icon" variant="ghost" className="text-red-500" onClick={() => removeStepInput(sIdx, inpIdx)}><Trash className="h-4 w-4" /></Button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </TabsContent>
+              <TabsContent value="json">
+                <Textarea className="font-mono h-40" value={stepsJson} onChange={e => setStepsJson(e.target.value)} />
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
         <DialogFooter>
@@ -582,6 +806,283 @@ function ParametersStepper({ parameters }: { parameters: any[] }) {
           <li className="ml-6 text-gray-500">No parameters defined.</li>
         )}
       </ol>
+    </div>
+  );
+}
+
+function AddParametersStepsTabs({ form }: { form: any }) {
+  const [paramMode, setParamMode] = useState<'ui' | 'json'>('ui');
+  const [stepMode, setStepMode] = useState<'ui' | 'json'>('ui');
+
+  // Parameters state
+  const [parameters, setParameters] = useState<any[]>([
+    { title: '', required: '', properties: [] }
+  ]);
+  const [parametersJson, setParametersJson] = useState('[]');
+
+  // Steps state
+  const [steps, setSteps] = useState<any[]>([
+    { name: '', action: '', id: '', input: [] }
+  ]);
+  const [stepsJson, setStepsJson] = useState('[]');
+
+  // Sync UI <-> JSON for parameters
+  useEffect(() => {
+    if (paramMode === 'ui') {
+      setParametersJson(JSON.stringify(
+        parameters.map(p => ({
+          ...p,
+          required: p.required ? p.required.split(',').map((s: string) => s.trim()).filter(Boolean) : [],
+          properties: p.properties.reduce((acc: any, cur: any) => {
+            if (cur.key) acc[cur.key] = cur.value;
+            return acc;
+          }, {})
+        })),
+        null, 2
+      ));
+    }
+  }, [parameters, paramMode]);
+  useEffect(() => {
+    if (paramMode === 'json') {
+      try {
+        const arr = JSON.parse(parametersJson);
+        setParameters(Array.isArray(arr) ? arr.map((p: any) => ({
+          ...p,
+          required: Array.isArray(p.required) ? p.required.join(", ") : "",
+          properties: p.properties ? Object.entries(p.properties).map(([k, v]) => ({ key: k, value: v })) : [],
+        })) : []);
+      } catch {}
+    }
+  }, [parametersJson, paramMode]);
+
+  // Sync UI <-> JSON for steps
+  useEffect(() => {
+    if (stepMode === 'ui') {
+      setStepsJson(JSON.stringify(
+        steps.map(s => ({
+          ...s,
+          input: s.input.reduce((acc: any, cur: any) => {
+            if (cur.key) acc[cur.key] = cur.value;
+            return acc;
+          }, {})
+        })),
+        null, 2
+      ));
+    }
+  }, [steps, stepMode]);
+  useEffect(() => {
+    if (stepMode === 'json') {
+      try {
+        const arr = JSON.parse(stepsJson);
+        setSteps(Array.isArray(arr) ? arr.map((s: any) => ({
+          ...s,
+          input: s.input ? Object.entries(s.input).map(([k, v]) => ({ key: k, value: v })) : [],
+        })) : []);
+      } catch {}
+    }
+  }, [stepsJson, stepMode]);
+
+  // Parameter handlers (same as Edit dialog)
+  const handleParamChange = (idx: number, field: string, value: any) => {
+    setParameters(params => params.map((p, i) => i === idx ? { ...p, [field]: value } : p));
+  };
+  const handleParamPropertyChange = (pIdx: number, propIdx: number, field: string, value: any) => {
+    setParameters(params => params.map((p, i) => i === pIdx ? {
+      ...p,
+      properties: p.properties.map((prop: any, j: number) => j === propIdx ? { ...prop, [field]: value } : prop)
+    } : p));
+  };
+  const addParamProperty = (pIdx: number) => {
+    setParameters(params => params.map((p, i) => i === pIdx ? {
+      ...p,
+      properties: [...p.properties, { key: '', value: '' }]
+    } : p));
+  };
+  const removeParamProperty = (pIdx: number, propIdx: number) => {
+    setParameters(params => params.map((p, i) => i === pIdx ? {
+      ...p,
+      properties: p.properties.filter((_: any, j: number) => j !== propIdx)
+    } : p));
+  };
+  const addParameter = () => {
+    setParameters(params => [...params, { title: '', required: '', properties: [] }]);
+  };
+  const removeParameter = (idx: number) => {
+    setParameters(params => params.filter((_, i) => i !== idx));
+  };
+
+  // Step handlers (same as Edit dialog)
+  const handleStepChange = (idx: number, field: string, value: any) => {
+    setSteps(steps => steps.map((s, i) => i === idx ? { ...s, [field]: value } : s));
+  };
+  const handleStepInputChange = (sIdx: number, inputIdx: number, field: string, value: any) => {
+    setSteps(steps => steps.map((s, i) => i === sIdx ? {
+      ...s,
+      input: s.input.map((inp: any, j: number) => j === inputIdx ? { ...inp, [field]: value } : inp)
+    } : s));
+  };
+  const addStepInput = (sIdx: number) => {
+    setSteps(steps => steps.map((s, i) => i === sIdx ? {
+      ...s,
+      input: [...(s.input || []), { key: '', value: '' }]
+    } : s));
+  };
+  const removeStepInput = (sIdx: number, inputIdx: number) => {
+    setSteps(steps => steps.map((s, i) => i === sIdx ? {
+      ...s,
+      input: s.input.filter((_: any, j: number) => j !== inputIdx)
+    } : s));
+  };
+  const addStep = () => {
+    setSteps(steps => [...steps, { name: '', action: '', id: '', input: [] }]);
+  };
+  const removeStep = (idx: number) => {
+    setSteps(steps => steps.filter((_, i) => i !== idx));
+  };
+
+  // On submit, set the form values for parameters and steps
+  useEffect(() => {
+    if (paramMode === 'ui') {
+      form.setValue('parameters', parameters.map(p => ({
+        ...p,
+        required: p.required ? p.required.split(',').map((s: string) => s.trim()).filter(Boolean) : [],
+        properties: p.properties.reduce((acc: any, cur: any) => {
+          if (cur.key) acc[cur.key] = cur.value;
+          return acc;
+        }, {})
+      })));
+    } else {
+      try {
+        form.setValue('parameters', JSON.parse(parametersJson));
+      } catch {}
+    }
+  }, [parameters, parametersJson, paramMode, form]);
+  useEffect(() => {
+    if (stepMode === 'ui') {
+      form.setValue('steps', steps.map(s => ({
+        ...s,
+        input: s.input.reduce((acc: any, cur: any) => {
+          if (cur.key) acc[cur.key] = cur.value;
+          return acc;
+        }, {})
+      })));
+    } else {
+      try {
+        form.setValue('steps', JSON.parse(stepsJson));
+      } catch {}
+    }
+  }, [steps, stepsJson, stepMode, form]);
+
+  return (
+    <div className="space-y-6">
+      {/* Parameters */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <label className="block text-sm font-medium">Parameters</label>
+        </div>
+        <Tabs value={paramMode} onValueChange={v => setParamMode(v as 'ui' | 'json') } className="w-full">
+          <TabsList className="mb-2">
+            <TabsTrigger value="ui">Configure via UI</TabsTrigger>
+            <TabsTrigger value="json">Paste/Edit JSON</TabsTrigger>
+          </TabsList>
+          <TabsContent value="ui">
+            <div className="mb-2 text-right">
+              <Button size="sm" variant="outline" onClick={addParameter}>Add Parameter</Button>
+            </div>
+            <div className="space-y-4">
+              {parameters.map((param, pIdx) => (
+                <div key={pIdx} className="border rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-xs font-medium mb-1">Title</label>
+                    <Button size="icon" variant="ghost" className="text-red-500" onClick={() => removeParameter(pIdx)}><Trash className="h-4 w-4" /></Button>
+                  </div>
+                  <div className="mb-2">
+                    <Input value={param.title} onChange={e => handleParamChange(pIdx, "title", e.target.value)} />
+                  </div>
+                  <div className="mb-2">
+                    <label className="block text-xs font-medium mb-1">Required (comma separated)</label>
+                    <Input value={param.required} onChange={e => handleParamChange(pIdx, "required", e.target.value)} />
+                  </div>
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-xs font-medium">Properties</label>
+                      <Button size="sm" variant="outline" onClick={() => addParamProperty(pIdx)}>Add Property</Button>
+                    </div>
+                    <div className="space-y-2">
+                      {param.properties.map((prop: any, propIdx: number) => (
+                        <div key={propIdx} className="flex gap-2 items-center">
+                          <Input className="w-1/3" placeholder="Key" value={prop.key} onChange={e => handleParamPropertyChange(pIdx, propIdx, "key", e.target.value)} />
+                          <Input className="w-2/3" placeholder="Value" value={prop.value} onChange={e => handleParamPropertyChange(pIdx, propIdx, "value", e.target.value)} />
+                          <Button size="icon" variant="ghost" className="text-red-500" onClick={() => removeParamProperty(pIdx, propIdx)}><Trash className="h-4 w-4" /></Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </TabsContent>
+          <TabsContent value="json">
+            <Textarea className="font-mono h-40" value={parametersJson} onChange={e => setParametersJson(e.target.value)} />
+          </TabsContent>
+        </Tabs>
+      </div>
+      {/* Steps */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <label className="block text-sm font-medium">Steps</label>
+        </div>
+        <Tabs value={stepMode} onValueChange={v => setStepMode(v as 'ui' | 'json') } className="w-full">
+          <TabsList className="mb-2">
+            <TabsTrigger value="ui">Configure via UI</TabsTrigger>
+            <TabsTrigger value="json">Paste/Edit JSON</TabsTrigger>
+          </TabsList>
+          <TabsContent value="ui">
+            <div className="mb-2 text-right">
+              <Button size="sm" variant="outline" onClick={addStep}>Add Step</Button>
+            </div>
+            <div className="space-y-4">
+              {steps.map((step, sIdx) => (
+                <div key={sIdx} className="border rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-xs font-medium mb-1">Name</label>
+                    <Button size="icon" variant="ghost" className="text-red-500" onClick={() => removeStep(sIdx)}><Trash className="h-4 w-4" /></Button>
+                  </div>
+                  <div className="mb-2">
+                    <Input value={step.name} onChange={e => handleStepChange(sIdx, "name", e.target.value)} />
+                  </div>
+                  <div className="mb-2">
+                    <label className="block text-xs font-medium mb-1">Action</label>
+                    <Input value={step.action} onChange={e => handleStepChange(sIdx, "action", e.target.value)} />
+                  </div>
+                  <div className="mb-2">
+                    <label className="block text-xs font-medium mb-1">ID</label>
+                    <Input value={step.id} onChange={e => handleStepChange(sIdx, "id", e.target.value)} />
+                  </div>
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-xs font-medium">Input</label>
+                      <Button size="sm" variant="outline" onClick={() => addStepInput(sIdx)}>Add Input</Button>
+                    </div>
+                    <div className="space-y-2">
+                      {Array.isArray(step.input) && step.input.map((inp: any, inpIdx: number) => (
+                        <div key={inpIdx} className="flex gap-2 items-center">
+                          <Input className="w-1/3" placeholder="Key" value={inp.key} onChange={e => handleStepInputChange(sIdx, inpIdx, "key", e.target.value)} />
+                          <Input className="w-2/3" placeholder="Value" value={inp.value} onChange={e => handleStepInputChange(sIdx, inpIdx, "value", e.target.value)} />
+                          <Button size="icon" variant="ghost" className="text-red-500" onClick={() => removeStepInput(sIdx, inpIdx)}><Trash className="h-4 w-4" /></Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </TabsContent>
+          <TabsContent value="json">
+            <Textarea className="font-mono h-40" value={stepsJson} onChange={e => setStepsJson(e.target.value)} />
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 }
