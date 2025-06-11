@@ -2,10 +2,38 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
+import fetch from "node-fetch";
+
+const BACKSTAGE_API_URL = "https://platformnex-backend-pyzx2jrmda-uc.a.run.app";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Set up authentication routes
   setupAuth(app);
+
+  // Proxy route for Backstage API catalog entities
+  app.get("/api/catalog/entities", async (req, res) => {
+    try {
+      const response = await fetch(
+        `${BACKSTAGE_API_URL}/api/catalog/entities?${req.url.split('?')[1]}`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': '*/*',
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Safari/605.1.15'
+          }
+        }
+      );
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch from Backstage API');
+      }
+      
+      const data = await response.json();
+      res.json(data);
+    } catch (err) {
+      res.status(500).json({ message: "Failed to fetch templates" });
+    }
+  });
 
   // Get developer metrics data
   app.get("/api/metrics/developer", async (req, res) => {
